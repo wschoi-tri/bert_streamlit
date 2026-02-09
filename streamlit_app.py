@@ -239,7 +239,7 @@ def visualize_vector_patterns(results, top_n=100):
 
 def main():
     st.set_page_config(page_title="BERT 조회", layout="centered")
-    st.title("BERT 조회 (키워드, 상품), zilliz 연동")
+    st.title("BERT 조회 (모델선택)")
 
     # 모델 선택
     model_options = {
