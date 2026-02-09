@@ -260,7 +260,7 @@ def main():
             st.error(f"리소스 로드 실패: {e}")
             return
 
-    top_k = 100
+    top_k = 50
 
     # 검색 UI (탭으로 분리)
     tab1, tab2 = st.tabs([" 키워드 검색", " 상품 번호 검색"])
