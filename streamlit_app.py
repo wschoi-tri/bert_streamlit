@@ -179,7 +179,7 @@ def visualize_similarity_scores(results):
     
     st.altair_chart(chart, use_container_width=True)
 
-def visualize_vector_patterns(results, top_n=100):
+def visualize_vector_patterns(results, top_n=50):
     """상위 검색 결과의 벡터 값 패턴을 겹쳐서 시각화합니다."""
     if not results:
         return
