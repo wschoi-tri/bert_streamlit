@@ -1,0 +1,40 @@
+# --- Deep Learning Core ---
+# PyTorch: 딥러닝 프레임워크 (GPU 사용 시 환경에 따라 별도 설치 필요할 수 있음)
+torch>=2.2.0
+
+# Transformers: BERT 모델 사용 (Hugging Face)
+transformers>=4.41.2
+
+# Accelerate: PyTorch 모델 학습 및 추론 가속화 (Transformers 권장 의존성)
+accelerate>=0.30.1
+
+# --- Data Processing & Machine Learning ---
+# Scikit-learn: PCA 차원 축소용
+scikit-learn>=1.4.0
+
+# Pandas: CSV 데이터 처리
+pandas>=2.2.0
+
+# NumPy: 수치 연산 (Pandas/Scikit-learn 의존성)
+numpy>=1.26.0
+
+# --- Vector Search ---
+# FAISS: 벡터 검색 엔진 (CPU 버전)
+faiss-cpu>=1.7.4
+
+# Milvus SDK: Zilliz/Milvus 데이터베이스 연동
+pymilvus>=2.3.0
+
+# --- Backend API ---
+# FastAPI: 고성능 API 프레임워크
+fastapi>=0.109.0
+
+# Uvicorn: ASGI 웹 서버 (FastAPI 구동용)
+uvicorn>=0.27.0
+
+# Pydantic: 데이터 유효성 검사 (FastAPI 의존성 명시)
+pydantic>=2.6.0
+
+# --- Frontend UI ---
+# Streamlit: 데이터 테스트용 웹 UI
+streamlit>=1.31.0
