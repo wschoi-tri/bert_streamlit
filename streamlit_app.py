@@ -18,6 +18,9 @@ load_dotenv()
 # MILVUS_TOKEN = os.getenv("ZILLIZ_TOKEN")
 MILVUS_URI = st.secrets["MILVUS"]["MILVUS_URI"]
 MILVUS_TOKEN = st.secrets["MILVUS"]["MILVUS_TOKEN"]
+os.environ["HF_TOKEN"] = st.secrets["MILVUS"]["HF_TOKEN"]
+os.environ["HUGGINGFACEHUB_API_TOKEN"] = st.secrets["MILVUS"]["HF_TOKEN"]
+
 
 # 상품 상세 정보 조회용 외부 API (하프클럽)
 PRD_INFO_API_URL = "http://hapix.halfclub.com/searches/prdList/"
