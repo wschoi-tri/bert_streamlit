@@ -74,7 +74,7 @@ if data:
                     
                     if hits:
                         # 화면이 너무 길어지지 않도록 상위 4개 상품만 1줄로 표시
-                        display_hits = hits[:20]
+                        display_hits = hits[:40]
                         cols = st.columns(4)
                         for idx, hit in enumerate(display_hits):
                             source = hit.get("_source", {})
