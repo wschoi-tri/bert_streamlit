@@ -8,11 +8,11 @@ st.set_page_config(
     layout="centered"
 )
 
-st.title("🔥 인기키워드 상품 확인")
+st.title("보리 인기 키워드 확인")
 
 API_URL = "https://apix.boribori.co.kr/searches/popularKeyword/?countryCd=001&langCd=001&siteCd=2&deviceCd=002&mandM=b_boribori"
 
-@st.cache_data(ttl=300)  # API 호출 결과를 5분(300초) 동안 캐싱
+@st.cache_data(ttl=3)  # API 호출 결과를 5분(300초) 동안 캐싱
 def fetch_popular_keywords():
     try:
         response = requests.get(API_URL, timeout=15)
@@ -58,7 +58,7 @@ if data:
                 search_api_url = "https://apix.boribori.co.kr/searches/prdList/"
                 params = {
                     "keyword": kw,
-                    "limit": "0,20",
+                    "limit": "0,40",
                     "sortSeq": "12",
                     "siteCd": "2",
                     "device": "mc",
