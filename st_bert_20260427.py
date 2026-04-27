@@ -175,11 +175,21 @@ def display_product_grid(data, prd_no_input, is_hybrid=False, score_label="유�
                     """
                     st.markdown(html_content, unsafe_allow_html=True)
 
+# URL 파라미터에서 prd_no 가져오기
+query_params = st.query_params
+url_prd_no = query_params.get("prd_no", "")
+
+# URL 파라미터가 있을 경우 초기 검색 자동 실행 설정
+if url_prd_no and "url_processed" not in st.session_state:
+    st.session_state['searched'] = True
+    st.session_state['url_processed'] = True
+
 # 상단 레이아웃
 main_top_col1, main_top_col2 = st.columns([1, 4])
 
 with main_top_col1:
-    prd_no_input = st.text_input("상품 번호(prd_no)를 입력하세요", placeholder="예: 111464580")
+    # URL 파라미터가 있으면 기본값으로 설정
+    prd_no_input = st.text_input("상품 번호(prd_no)를 입력하세요", value=url_prd_no, placeholder="예: 111464580")
     st.write("")
     search_button = st.button("유사 상품 찾기", type="primary", use_container_width=True)
 
