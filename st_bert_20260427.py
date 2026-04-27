@@ -78,10 +78,9 @@ def search_direct(collection, prd_no, limit, output_fields):
 
 # --- Streamlit UI 시작 ---
 
-st.set_page_config(page_title="유사 상품 추천 (Direct)", page_icon="🛍️", layout="wide")
+st.set_page_config(page_title="BERT 유사 상품", page_icon="🛍️", layout="wide")
 
-st.title("🛍️ 유사 상품 추천 시스템 (Direct DB Access)")
-st.markdown("FastAPI 서버 없이 데이터베이스(Zilliz)에 직접 연결하여 유사 상품을 검색합니다.")
+st.title("🛍️ BERT 유사 상품 추천 확인")
 
 # Zilliz 컬렉션 초기화
 meta_collection, desc_collection = get_zilliz_collections()
