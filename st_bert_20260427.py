@@ -212,7 +212,7 @@ if prd_no_input.strip() and (search_button or st.session_state.get('searched')):
 
     st.markdown("---")
 
-    tab1, tab2, tab3, tab4 = st.tabs(["📊 메타 추천", "📝 설명 추천", "🧬 하이브리드", "🔥 메타 우선"])
+    tab1, tab2, tab3, tab4 = st.tabs(["📊 상품 정보 (메타)", "📝 상품 설명", "🧬 평균 합산", "🔥 가중치 합산"])
 
     # 공통 대량 검색 (하이브리드 및 메타 우선용)
     meta_h = search_direct(meta_collection, prd_no_input.strip(), HYBRID_INTERNAL_LIMIT, ["prd_no", "brand", "sel_prc", "ctgr1", "ctgr2", "ctgr3", "txt"])
@@ -233,7 +233,7 @@ if prd_no_input.strip() and (search_button or st.session_state.get('searched')):
             hybrid_map[p_no] = {"data": item, "meta_score": 0.0, "desc_score": item["similarity_score"], "meta_txt": "", "desc_txt": item.get("desc") or item.get("txt", "")}
 
     with tab1:
-        st.subheader("메타 데이터 기반 유사 상품")
+        st.subheader("상품 정보 (메타) 기반 유사 상품")
         display_product_grid(meta_h[:DEFAULT_LIMIT], prd_no_input.strip())
 
     with tab2:
@@ -241,8 +241,7 @@ if prd_no_input.strip() and (search_button or st.session_state.get('searched')):
         display_product_grid(desc_h[:DEFAULT_LIMIT], prd_no_input.strip())
 
     with tab3:
-        st.subheader("하이브리드 추천 결과 (Meta + Desc)")
-        st.info(f"💡 두 컬렉션의 점수를 가중 합산하며, 교집합 상품을 우선적으로 표시합니다.")
+        st.subheader("평균 합산 추천 결과 (Meta + Desc)")
         
         h_col1, h_col2 = st.columns(2)
         with h_col1: w_meta = st.slider("메타 데이터 가중치", 0.0, 1.0, 0.5, 0.1, key="w_meta_tab3")
@@ -262,8 +261,7 @@ if prd_no_input.strip() and (search_button or st.session_state.get('searched')):
         display_product_grid(hybrid_results, prd_no_input.strip(), is_hybrid=True)
 
     with tab4:
-        st.subheader("메타 데이터 기반 + 설명 가중치 (Meta-First)")
-        st.info("💡 메타 데이터 검색 결과를 기준으로 하며, 설명 유사도가 높을수록 점수가 가산되어 순위가 상승합니다.")
+        st.subheader("가중치 합산 추천 결과")
         
         w_extra = st.slider("설명 데이터 추가 점수 가중치", 0.0, 1.0, 0.3, 0.05, key="w_extra_tab4")
         
