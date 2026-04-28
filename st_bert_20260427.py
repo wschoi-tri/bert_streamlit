@@ -8,8 +8,8 @@ ZILLIZ_URI = st.secrets["MILVUS"]["MILVUS_URI"]
 ZILLIZ_TOKEN = st.secrets["MILVUS"]["MILVUS_TOKEN"]
 
 # 컬렉션 이름 정의
-prd_meta_collection_name = "Product_Embeddings"
-prd_desc_collection_name = "prd_llm_desc_vec"
+prd_meta_collection_name = "prd_meta_vec"
+prd_desc_collection_name = "prd_desc_vec"
 
 # 2. Zilliz(Milvus) 직접 연결 및 로드 (싱글톤 패턴 유사하게 캐싱)
 @st.cache_resource
