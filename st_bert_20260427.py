@@ -131,7 +131,7 @@ def display_product_grid(data, prd_no_input, is_hybrid=False, score_label="유�
             zilliz_ctgr = f"{item.get('ctgr1','')} > {item.get('ctgr2','')} > {item.get('ctgr3','')}".strip(" >")
             zilliz_diff_html = ""
             if not is_hybrid and zilliz_ctgr and api_ctgr != zilliz_ctgr:
-                zilliz_diff_html = f"<div style='color:#f57c00; margin-top:2px;'>  {zilliz_ctgr}</div>"
+                zilliz_diff_html = f"<div style='color:#f57c00; margin-top:2px; font-weight:bold;'>  {zilliz_ctgr}</div>"
 
             if is_hybrid:
                 h_meta = item.get("h_meta_score", 0)
@@ -210,12 +210,12 @@ if prd_no_input.strip() and (search_button or st.session_state.get('searched')):
     
     with main_top_col2:
         if target_info:
-            t_col1, t_col2 = st.columns([1, 3])
+            t_col1, t_col2 = st.columns([1, 6])
             with t_col1:
                 img_url = target_info.get("appPrdImgUrl") or target_info.get("prdImgUrl")
                 if img_url:
                     if img_url.startswith("//"): img_url = "https:" + img_url
-                    st.image(img_url, width=150)
+                    st.image(img_url, use_container_width=True)
                 else: st.markdown("**(이미지 없음)**")
             with t_col2:
                 st.markdown("### 🎯 기준 상품")
