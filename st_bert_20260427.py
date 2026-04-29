@@ -158,7 +158,7 @@ def display_product_grid(data, prd_no_input, is_hybrid=False, score_label="유�
 
             with cols[idx]:
                 with st.container(border=True):
-                    if img_url: st.image(img_url, width=120)
+                    if img_url: st.image(img_url, use_container_width=True)
                     else: st.write("이미지 없음")
                         
                     html_content = (
