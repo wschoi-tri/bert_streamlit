@@ -8,8 +8,8 @@ ZILLIZ_URI = st.secrets["MILVUS"]["MILVUS_URI"]
 ZILLIZ_TOKEN = st.secrets["MILVUS"]["MILVUS_TOKEN"]
 
 # 컬렉션 이름 정의
-prd_meta_collection_name = "prd_meta_vec"
-prd_desc_collection_name = "prd_desc_vec"
+prd_meta_collection_name = st.secrets["MILVUS"]["COLLECTION_PRD_META"]
+prd_desc_collection_name = st.secrets["MILVUS"]["COLLECTION_PRD_DESC"]
 
 # 2. Zilliz(Milvus) 직접 연결 및 로드 (싱글톤 패턴 유사하게 캐싱)
 @st.cache_resource
@@ -127,6 +127,12 @@ def display_product_grid(data, prd_no_input, is_hybrid=False, score_label="유�
             api_sel_prc = detail.get("selPrc", 0)
             api_ctgr = f"{detail.get('dpCtgrNm1','')} > {detail.get('dpCtgrNm2','')} > {detail.get('dpCtgrNm3','')}".strip(" >")
             
+            # Zilliz 카테고리와 차이 확인
+            zilliz_ctgr = f"{item.get('ctgr1','')} > {item.get('ctgr2','')} > {item.get('ctgr3','')}".strip(" >")
+            zilliz_diff_html = ""
+            if not is_hybrid and zilliz_ctgr and api_ctgr != zilliz_ctgr:
+                zilliz_diff_html = f"<div style='color:#f57c00; margin-top:2px;'>• 분류: {zilliz_ctgr}</div>"
+
             if is_hybrid:
                 h_meta = item.get("h_meta_score", 0)
                 h_desc = item.get("h_desc_score", 0)
@@ -142,37 +148,40 @@ def display_product_grid(data, prd_no_input, is_hybrid=False, score_label="유�
                 h_meta_txt = item.get("h_meta_txt", "")
                 h_desc_txt = item.get("h_desc_txt", "")
                 zilliz_txt_html = ""
-                if h_meta_txt: zilliz_txt_html += f"<div style='font-size:0.75em; color:#1976d2; margin-top:2px; font-weight:bold;'>[Meta]</div><div title='{h_meta_txt}' style='font-size:0.8em; background-color:#eef5ff; padding:4px; border-radius:4px; line-height:1.2; height:50px; overflow-y:auto; border:1px solid #cce0ff;'>{h_meta_txt}</div>"
-                if h_desc_txt: zilliz_txt_html += f"<div style='font-size:0.75em; color:#388e3c; margin-top:2px; font-weight:bold;'>[Desc]</div><div title='{h_desc_txt}' style='font-size:0.8em; background-color:#f1f8e9; padding:4px; border-radius:4px; line-height:1.2; height:50px; overflow-y:auto; border:1px solid #dcedc8;'>{h_desc_txt}</div>"
+                if h_meta_txt: 
+                    zilliz_txt_html += f"<div style='font-size:0.75em; color:#1976d2; margin-top:2px; font-weight:bold;'>[Meta]</div><div style='font-size:0.8em; background-color:#eef5ff; padding:4px; border-radius:4px; line-height:1.2; height:50px; overflow-y:auto; border:1px solid #cce0ff;'>{h_meta_txt}</div>"
+                if h_desc_txt: 
+                    zilliz_txt_html += f"<div style='font-size:0.75em; color:#388e3c; margin-top:2px; font-weight:bold;'>[Desc]</div><div style='font-size:0.8em; background-color:#f1f8e9; padding:4px; border-radius:4px; line-height:1.2; height:50px; overflow-y:auto; border:1px solid #dcedc8;'>{h_desc_txt}</div>"
             else:
                 zilliz_txt = item.get("txt") or item.get("desc") or "정보 없음"
-                zilliz_txt_html = f"<div title='{zilliz_txt}' style='font-size:0.85em; background-color:#eef5ff; padding:5px; border-radius:4px; margin-top:4px; line-height:1.4; height:100px; overflow-y:auto; border:1px solid #cce0ff; word-break:keep-all;'>{zilliz_txt}</div>"
+                zilliz_txt_html = f"<div style='font-size:0.85em; background-color:#eef5ff; padding:5px; border-radius:4px; margin-top:4px; line-height:1.4; height:100px; overflow-y:auto; border:1px solid #cce0ff; word-break:keep-all;'>{zilliz_txt}</div>"
 
             with cols[idx]:
                 with st.container(border=True):
                     if img_url: st.image(img_url, use_container_width=True)
                     else: st.write("이미지 없음")
                         
-                    html_content = f"""
-                    <div style="margin-bottom: 4px;">
-                        <div style='font-size:0.9em; font-weight:bold; height:2.4em; overflow:hidden; text-overflow:ellipsis; margin-bottom: 4px; line-height: 1.2;'>
-                            <a href='http://www.halfclub.com/product/{api_prd_no}' target='_blank' style='text-decoration:none;'>{api_prd_nm} 🔗</a>
-                        </div>
-                        <div style='font-size:0.75em; color:#555; line-height: 1.25;'>
-                            • 번호: {api_prd_no}<br>
-                            • 분류: {api_ctgr}<br>
-                            • 브랜드: {api_brand}<br>
-                            <span style='color:#d32f2f; font-weight:bold; font-size:1.1em;'>• 가격: {api_sel_prc:,}원</span>
-                        </div>
-                    </div>
-                    <div style="border-top: 1px dashed #ccc; margin: 6px 0;"></div>
-                    <div style="margin-bottom: 5px;">
-                        <div style='font-size:0.75em; color:#555; line-height: 1.25;'>
-                            • {score_label}: {score_html}<br>
-                            {zilliz_txt_html}
-                        </div>
-                    </div>
-                    """
+                    html_content = (
+                        f"<div style='margin-bottom: 4px;'>"
+                        f"<div style='font-size:0.9em; font-weight:bold; height:2.4em; overflow:hidden; text-overflow:ellipsis; margin-bottom: 4px; line-height: 1.2;'>"
+                        f"<a href='http://www.halfclub.com/product/{api_prd_no}' target='_blank' style='text-decoration:none;'>{api_prd_nm} 🔗</a>"
+                        f"</div>"
+                        f"<div style='font-size:0.75em; color:#555; line-height: 1.25;'>"
+                        f"• 번호: {api_prd_no}<br>"
+                        f"• 분류: {api_ctgr}<br>"
+                        f"• 브랜드: {api_brand}<br>"
+                        f"<div style='color:#d32f2f; font-weight:bold; font-size:1.1em;'>• 가격: {api_sel_prc:,}원</div>"
+                        f"{zilliz_diff_html}"
+                        f"</div>"
+                        f"</div>"
+                        f"<div style='border-top: 1px dashed #ccc; margin: 6px 0;'></div>"
+                        f"<div style='margin-bottom: 5px;'>"
+                        f"<div style='font-size:0.75em; color:#555; line-height: 1.25;'>"
+                        f"• {score_label}: {score_html}<br>"
+                        f"{zilliz_txt_html}"
+                        f"</div>"
+                        f"</div>"
+                    )
                     st.markdown(html_content, unsafe_allow_html=True)
 
 # URL 파라미터에서 prd_no 가져오기
@@ -302,3 +311,4 @@ if prd_no_input.strip() and (search_button or st.session_state.get('searched')):
 
 elif not prd_no_input.strip() and search_button:
     st.warning("⚠️ 상품 번호를 입력해 주세요.")
+
