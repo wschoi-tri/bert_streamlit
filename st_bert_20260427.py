@@ -195,12 +195,11 @@ if url_prd_no and "url_processed" not in st.session_state:
     st.session_state['url_processed'] = True
 
 # 상단 레이아웃
-main_top_col1, main_top_col2 = st.columns([1, 4])
+main_top_col1, main_top_col2 = st.columns([1, 5])
 
 with main_top_col1:
     # URL 파라미터가 있으면 기본값으로 설정
-    prd_no_input = st.text_input("상품 번호(prd_no)를 입력하세요", value=url_prd_no, placeholder="예: 111464580")
-    st.write("")
+    prd_no_input = st.text_input("상품 번호(prd_no)를 입력하세요 (413157091)", value=url_prd_no, placeholder="예: 413157091")
     search_button = st.button("유사 상품 찾기", type="primary", use_container_width=True)
 
 if prd_no_input.strip() and (search_button or st.session_state.get('searched')):
