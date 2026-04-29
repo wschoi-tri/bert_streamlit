@@ -131,7 +131,7 @@ def display_product_grid(data, prd_no_input, is_hybrid=False, score_label="유�
             zilliz_ctgr = f"{item.get('ctgr1','')} > {item.get('ctgr2','')} > {item.get('ctgr3','')}".strip(" >")
             zilliz_diff_html = ""
             if not is_hybrid and zilliz_ctgr and api_ctgr != zilliz_ctgr:
-                zilliz_diff_html = f"<div style='color:#f57c00; margin-top:2px;'>• 분류: {zilliz_ctgr}</div>"
+                zilliz_diff_html = f"<div style='color:#f57c00; margin-top:2px;'>  {zilliz_ctgr}</div>"
 
             if is_hybrid:
                 h_meta = item.get("h_meta_score", 0)
@@ -158,7 +158,7 @@ def display_product_grid(data, prd_no_input, is_hybrid=False, score_label="유�
 
             with cols[idx]:
                 with st.container(border=True):
-                    if img_url: st.image(img_url, use_container_width=True)
+                    if img_url: st.image(img_url, width=120)
                     else: st.write("이미지 없음")
                         
                     html_content = (
@@ -167,11 +167,12 @@ def display_product_grid(data, prd_no_input, is_hybrid=False, score_label="유�
                         f"<a href='http://www.halfclub.com/product/{api_prd_no}' target='_blank' style='text-decoration:none;'>{api_prd_nm} 🔗</a>"
                         f"</div>"
                         f"<div style='font-size:0.75em; color:#555; line-height: 1.25;'>"
-                        f"• 번호: {api_prd_no}<br>"
-                        f"• 분류: {api_ctgr}<br>"
+                        f"• 상품번호: {api_prd_no}<br>"
                         f"• 브랜드: {api_brand}<br>"
-                        f"<div style='color:#d32f2f; font-weight:bold; font-size:1.1em;'>• 가격: {api_sel_prc:,}원</div>"
+                        f"• 카테고리:<br>"
+                        f"  {api_ctgr}<br>"
                         f"{zilliz_diff_html}"
+                        f"<div style='color:#d32f2f; font-weight:bold; font-size:1.1em;'>• 가격: {api_sel_prc:,}원</div>"
                         f"</div>"
                         f"</div>"
                         f"<div style='border-top: 1px dashed #ccc; margin: 6px 0;'></div>"
@@ -209,15 +210,15 @@ if prd_no_input.strip() and (search_button or st.session_state.get('searched')):
     
     with main_top_col2:
         if target_info:
-            st.markdown("### 🎯 기준 상품")
             t_col1, t_col2 = st.columns([1, 3])
             with t_col1:
                 img_url = target_info.get("appPrdImgUrl") or target_info.get("prdImgUrl")
                 if img_url:
                     if img_url.startswith("//"): img_url = "https:" + img_url
-                    st.image(img_url, use_container_width=True)
+                    st.image(img_url, width=150)
                 else: st.markdown("**(이미지 없음)**")
             with t_col2:
+                st.markdown("### 🎯 기준 상품")
                 api_ctgr = f"{target_info.get('dpCtgrNm1','')} > {target_info.get('dpCtgrNm2','')} > {target_info.get('dpCtgrNm3','')}".strip(" >")
                 st.markdown(f"""
                 <h3 style='margin-bottom: 10px; margin-top: 0;'>{target_info.get("prdNm", "이름 없음")}</h3>
