@@ -241,15 +241,15 @@ if prd_no_input.strip() and (search_button or st.session_state.get('searched')):
     hybrid_map = {}
     for item in meta_h:
         p_no = str(item["prd_no"]).strip()
-        hybrid_map[p_no] = {"data": item, "meta_score": item["similarity_score"], "desc_score": 0.0, "meta_txt": item.get("txt", ""), "desc_txt": ""}
+        hybrid_map[p_no] = {"data": item, "meta_score": item["similarity_score"], "desc_score": 0.0, "meta_txt": item.get("text", ""), "desc_txt": ""}
     
     for item in desc_h:
         p_no = str(item["prd_no"]).strip()
         if p_no in hybrid_map:
             hybrid_map[p_no]["desc_score"] = item["similarity_score"]
-            hybrid_map[p_no]["desc_txt"] = item.get("desc") or item.get("txt", "")
+            hybrid_map[p_no]["desc_txt"] = item.get("desc") or item.get("text", "")
         else:
-            hybrid_map[p_no] = {"data": item, "meta_score": 0.0, "desc_score": item["similarity_score"], "meta_txt": "", "desc_txt": item.get("desc") or item.get("txt", "")}
+            hybrid_map[p_no] = {"data": item, "meta_score": 0.0, "desc_score": item["similarity_score"], "meta_txt": "", "desc_txt": item.get("desc") or item.get("text", "")}
 
     with tab1:
         st.subheader("상품 정보 (메타) 기반 유사 상품")
