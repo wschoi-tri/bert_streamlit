@@ -7,8 +7,7 @@ import requests
 ZILLIZ_URI = st.secrets["MILVUS"]["MILVUS_URI"]
 ZILLIZ_TOKEN = st.secrets["MILVUS"]["MILVUS_TOKEN"]
 
-# 컬렉션 이름 정의
-prd_meta_collection_name = st.secrets["MILVUS"]["COLLECTION_PRD_META"]
+# 컬렉션 이름 정의 (lf_prd_meta와 prd_desc만 사용)
 lf_prd_meta_collection_name = st.secrets["MILVUS"]["COLLECTION_LF_PRD_META"]
 prd_desc_collection_name = st.secrets["MILVUS"]["COLLECTION_PRD_DESC"]
 
@@ -18,11 +17,6 @@ def get_zilliz_collections():
     try:
         connections.connect(alias="default", uri=ZILLIZ_URI, token=ZILLIZ_TOKEN)
         
-        meta_col = None
-        if utility.has_collection(prd_meta_collection_name):
-            meta_col = Collection(prd_meta_collection_name)
-            meta_col.load()
-            
         lf_meta_col = None
         if utility.has_collection(lf_prd_meta_collection_name):
             lf_meta_col = Collection(lf_prd_meta_collection_name)
@@ -33,23 +27,24 @@ def get_zilliz_collections():
             desc_col = Collection(prd_desc_collection_name)
             desc_col.load()
             
-        return meta_col, lf_meta_col, desc_col
+        return lf_meta_col, desc_col
     except Exception as e:
         st.error(f"❌ Zilliz 연결 에러: {e}")
-        return None, None, None
+        return None, None
 
-# 3. 직접 검색 함수 정의
-def search_direct(source_collection, target_collection, prd_no, limit, output_fields):
+# 3. 직접 검색 함수 정의 (필터링 expr 추가)
+def search_direct(collection, prd_no, limit, output_fields, expr=None):
     """
-    source_collection: 검색 기준이 되는 상품의 벡터를 조회할 컬렉션
-    target_collection: 유사 상품을 검색할 대상 컬렉션
+    collection: 유사 상품을 검색할 컬렉션
+    prd_no: 검색 기준 상품 번호
+    expr: 필터링 표현식 (예: 'lf_yn == true')
     """
-    if not source_collection or not target_collection:
+    if not collection:
         return []
     
     try:
-        # 1. 요청된 상품(prd_no)의 벡터(vector) 조회 (source_collection에서)
-        res = source_collection.query(
+        # 1. 요청된 상품(prd_no)의 벡터(vector) 조회
+        res = collection.query(
             expr=f'prd_no == "{prd_no}"', 
             output_fields=["vector"],
             limit=1
@@ -60,18 +55,19 @@ def search_direct(source_collection, target_collection, prd_no, limit, output_fi
             
         query_vector = res[0]["vector"]
         
-        # 2. 조회된 벡터를 기반으로 유사한 상품 검색 (target_collection에서)
+        # 2. 조회된 벡터를 기반으로 유사한 상품 검색
         search_params = {
             "metric_type": "COSINE", 
             "params": {}
         }
         
-        search_res = target_collection.search(
+        search_res = collection.search(
             data=[query_vector],
             anns_field="vector",
             param=search_params,
             limit=limit,
-            output_fields=output_fields
+            output_fields=output_fields,
+            expr=expr # 필터 조건 적용
         )
         
         results = []
@@ -88,12 +84,12 @@ def search_direct(source_collection, target_collection, prd_no, limit, output_fi
 
 # --- Streamlit UI 시작 ---
 
-st.set_page_config(page_title="BERT 유사 상품", page_icon="🛍️", layout="wide")
+st.set_page_config(page_title="LF 타겟 유사 상품", page_icon="🛍️", layout="wide")
 
-st.title("🛍️ BERT 유사 상품 추천 확인")
+st.title("🛍️ LF 타겟 유사 상품 추천 확인")
 
 # Zilliz 컬렉션 초기화
-meta_collection, lf_meta_collection, desc_collection = get_zilliz_collections()
+lf_meta_collection, desc_collection = get_zilliz_collections()
 
 # 고정 설정
 DEFAULT_LIMIT = 80
@@ -241,13 +237,24 @@ if prd_no_input.strip() and (search_button or st.session_state.get('searched')):
 
     st.markdown("---")
 
-    tab1, tab2, tab3, tab4 = st.tabs(["📊 상품 정보 (메타)", "📝 상품 설명", "🧬 평균 합산", "🔥 가중치 합산"])
+    tab1, tab2, tab3, tab4 = st.tabs(["📊 LF 상품 정보 (메타)", "📝 상품 설명", "🧬 평균 합산", "🔥 가중치 합산"])
 
     # 공통 대량 검색 (하이브리드 및 메타 우선용)
-    # meta_h: meta_collection에서 벡터를 찾고, lf_meta_collection에서 유사 상품을 검색
-    meta_h = search_direct(meta_collection, lf_meta_collection, prd_no_input.strip(), HYBRID_INTERNAL_LIMIT, ["prd_no", "brand", "sel_prc", "ctgr1", "ctgr2", "ctgr3", "text"])
+    # meta_h: lf_meta_collection에서 벡터를 찾고, lf_yn == true 필터링하여 검색
+    meta_h = search_direct(
+        lf_meta_collection, 
+        prd_no_input.strip(), 
+        HYBRID_INTERNAL_LIMIT, 
+        ["prd_no", "brand", "sel_prc", "ctgr1", "ctgr2", "ctgr3", "text"],
+        expr="lf_yn == true"
+    )
     # desc_h: desc_collection에서 벡터를 찾고, desc_collection에서 유사 상품을 검색
-    desc_h = search_direct(desc_collection, desc_collection, prd_no_input.strip(), HYBRID_INTERNAL_LIMIT, ["prd_no", "desc"])
+    desc_h = search_direct(
+        desc_collection, 
+        prd_no_input.strip(), 
+        HYBRID_INTERNAL_LIMIT, 
+        ["prd_no", "desc"]
+    )
     
     # 하이브리드 맵 생성
     hybrid_map = {}
