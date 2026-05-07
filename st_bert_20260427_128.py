@@ -153,7 +153,7 @@ def display_product_grid(data, prd_no_input, is_hybrid=False, score_label="유�
                 if h_desc_txt: 
                     zilliz_txt_html += f"<div style='font-size:0.75em; color:#388e3c; margin-top:2px; font-weight:bold;'>[Desc]</div><div style='font-size:0.8em; background-color:#f1f8e9; padding:4px; border-radius:4px; line-height:1.2; height:50px; overflow-y:auto; border:1px solid #dcedc8;'>{h_desc_txt}</div>"
             else:
-                zilliz_txt = item.get("txt") or item.get("desc") or "정보 없음"
+                zilliz_txt = item.get("text") or item.get("desc") or "정보 없음"
                 zilliz_txt_html = f"<div style='font-size:0.85em; background-color:#eef5ff; padding:5px; border-radius:4px; margin-top:4px; line-height:1.4; height:100px; overflow-y:auto; border:1px solid #cce0ff; word-break:keep-all;'>{zilliz_txt}</div>"
 
             with cols[idx]:
@@ -234,7 +234,7 @@ if prd_no_input.strip() and (search_button or st.session_state.get('searched')):
     tab1, tab2, tab3, tab4 = st.tabs(["📊 상품 정보 (메타)", "📝 상품 설명", "🧬 평균 합산", "🔥 가중치 합산"])
 
     # 공통 대량 검색 (하이브리드 및 메타 우선용)
-    meta_h = search_direct(meta_collection, prd_no_input.strip(), HYBRID_INTERNAL_LIMIT, ["prd_no", "brand", "sel_prc", "ctgr1", "ctgr2", "ctgr3", "txt"])
+    meta_h = search_direct(meta_collection, prd_no_input.strip(), HYBRID_INTERNAL_LIMIT, ["prd_no", "brand", "sel_prc", "ctgr1", "ctgr2", "ctgr3", "text"])
     desc_h = search_direct(desc_collection, prd_no_input.strip(), HYBRID_INTERNAL_LIMIT, ["prd_no", "desc"])
     
     # 하이브리드 맵 생성
