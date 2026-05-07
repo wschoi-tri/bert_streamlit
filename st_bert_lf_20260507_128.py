@@ -9,6 +9,7 @@ ZILLIZ_TOKEN = st.secrets["MILVUS"]["MILVUS_TOKEN"]
 
 # 컬렉션 이름 정의
 prd_meta_collection_name = st.secrets["MILVUS"]["COLLECTION_PRD_META"]
+lf_prd_meta_collection_name = st.secrets["MILVUS"]["COLLECTION_LF_PRD_META"]
 prd_desc_collection_name = st.secrets["MILVUS"]["COLLECTION_PRD_DESC"]
 
 # 2. Zilliz(Milvus) 직접 연결 및 로드 (싱글톤 패턴 유사하게 캐싱)
@@ -22,24 +23,33 @@ def get_zilliz_collections():
             meta_col = Collection(prd_meta_collection_name)
             meta_col.load()
             
+        lf_meta_col = None
+        if utility.has_collection(lf_prd_meta_collection_name):
+            lf_meta_col = Collection(lf_prd_meta_collection_name)
+            lf_meta_col.load()
+            
         desc_col = None
         if utility.has_collection(prd_desc_collection_name):
             desc_col = Collection(prd_desc_collection_name)
             desc_col.load()
             
-        return meta_col, desc_col
+        return meta_col, lf_meta_col, desc_col
     except Exception as e:
         st.error(f"❌ Zilliz 연결 에러: {e}")
-        return None, None
+        return None, None, None
 
 # 3. 직접 검색 함수 정의
-def search_direct(collection, prd_no, limit, output_fields):
-    if not collection:
+def search_direct(source_collection, target_collection, prd_no, limit, output_fields):
+    """
+    source_collection: 검색 기준이 되는 상품의 벡터를 조회할 컬렉션
+    target_collection: 유사 상품을 검색할 대상 컬렉션
+    """
+    if not source_collection or not target_collection:
         return []
     
     try:
-        # 1. 요청된 상품(prd_no)의 벡터(vector) 조회
-        res = collection.query(
+        # 1. 요청된 상품(prd_no)의 벡터(vector) 조회 (source_collection에서)
+        res = source_collection.query(
             expr=f'prd_no == "{prd_no}"', 
             output_fields=["vector"],
             limit=1
@@ -50,13 +60,13 @@ def search_direct(collection, prd_no, limit, output_fields):
             
         query_vector = res[0]["vector"]
         
-        # 2. 조회된 벡터를 기반으로 유사한 상품 검색
+        # 2. 조회된 벡터를 기반으로 유사한 상품 검색 (target_collection에서)
         search_params = {
             "metric_type": "COSINE", 
             "params": {}
         }
         
-        search_res = collection.search(
+        search_res = target_collection.search(
             data=[query_vector],
             anns_field="vector",
             param=search_params,
@@ -83,7 +93,7 @@ st.set_page_config(page_title="BERT 유사 상품", page_icon="🛍️", layout=
 st.title("🛍️ BERT 유사 상품 추천 확인")
 
 # Zilliz 컬렉션 초기화
-meta_collection, desc_collection = get_zilliz_collections()
+meta_collection, lf_meta_collection, desc_collection = get_zilliz_collections()
 
 # 고정 설정
 DEFAULT_LIMIT = 80
@@ -234,8 +244,10 @@ if prd_no_input.strip() and (search_button or st.session_state.get('searched')):
     tab1, tab2, tab3, tab4 = st.tabs(["📊 상품 정보 (메타)", "📝 상품 설명", "🧬 평균 합산", "🔥 가중치 합산"])
 
     # 공통 대량 검색 (하이브리드 및 메타 우선용)
-    meta_h = search_direct(meta_collection, prd_no_input.strip(), HYBRID_INTERNAL_LIMIT, ["prd_no", "brand", "sel_prc", "ctgr1", "ctgr2", "ctgr3", "text"])
-    desc_h = search_direct(desc_collection, prd_no_input.strip(), HYBRID_INTERNAL_LIMIT, ["prd_no", "desc"])
+    # meta_h: meta_collection에서 벡터를 찾고, lf_meta_collection에서 유사 상품을 검색
+    meta_h = search_direct(meta_collection, lf_meta_collection, prd_no_input.strip(), HYBRID_INTERNAL_LIMIT, ["prd_no", "brand", "sel_prc", "ctgr1", "ctgr2", "ctgr3", "text"])
+    # desc_h: desc_collection에서 벡터를 찾고, desc_collection에서 유사 상품을 검색
+    desc_h = search_direct(desc_collection, desc_collection, prd_no_input.strip(), HYBRID_INTERNAL_LIMIT, ["prd_no", "desc"])
     
     # 하이브리드 맵 생성
     hybrid_map = {}
