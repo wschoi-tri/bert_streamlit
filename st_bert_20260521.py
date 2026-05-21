@@ -100,7 +100,7 @@ def search_direct(collection, prd_no, limit, output_fields, base_expr=None):
 
 st.set_page_config(page_title="LF 타겟 유사 상품", page_icon="🛍️", layout="wide")
 
-st.title("🛍️ LF 타겟 유사 상품 추천 확인 (메타 전용)")
+st.title("🛍️ 상품 정보 기반 유사 상품 추천 (LF사입)")
 
 # Zilliz 컬렉션 초기화
 lf_meta_collection = get_zilliz_collection()
@@ -197,7 +197,7 @@ if url_prd_no and "url_processed" not in st.session_state:
 main_top_col1, main_top_col2 = st.columns([1, 5])
 
 with main_top_col1:
-    prd_no_input = st.text_input("상품 번호(prd_no)를 입력하세요 (413157091)", value=url_prd_no, placeholder="예: 413157091")
+    prd_no_input = st.text_input("상품 번호(prd_no)를 입력하세요, (사입 or 업배) (413157091)", value=url_prd_no, placeholder="예: 413157091")
     search_button = st.button("유사 상품 찾기", type="primary", use_container_width=True)
 
 if prd_no_input.strip() and (search_button or st.session_state.get('searched')):
@@ -229,7 +229,7 @@ if prd_no_input.strip() and (search_button or st.session_state.get('searched')):
 
     st.markdown("---")
 
-    st.subheader("📊 LF 상품 정보 (메타) 기반 유사 상품")
+    st.subheader("📊 상품 정보 기반 유사 상품 추천 (LF 사입)")
     
     # 기본 sel_acnt_cd 필터 전달 -> search_direct 함수 내부에서 ctgr1 조건과 AND 결합 처리됨
     meta_h = search_direct(
