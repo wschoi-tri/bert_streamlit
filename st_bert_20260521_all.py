@@ -100,7 +100,7 @@ def search_direct(collection, prd_no, limit, output_fields, base_expr=None):
 
 st.set_page_config(page_title="유사상품 추천", page_icon="🛍️", layout="wide")
 
-st.title("🛍️ 상품 정보 기반 유사 상품 추천 (LF사입)")
+st.title("🛍️ 상품 정보 기반 유사 상품 추천 (전체상품)")
 
 # Zilliz 컬렉션 초기화
 lf_meta_collection = get_zilliz_collection()
@@ -229,7 +229,7 @@ if prd_no_input.strip() and (search_button or st.session_state.get('searched')):
 
     st.markdown("---")
 
-    st.subheader("📊 상품 정보 기반 유사 상품 추천 (LF 사입)")
+    st.subheader("📊 상품 정보 기반 유사 상품 추천 (전체 상품)")
     
     # 기본 sel_acnt_cd 필터 전달 -> search_direct 함수 내부에서 ctgr1 조건과 AND 결합 처리됨
     meta_h = search_direct(
