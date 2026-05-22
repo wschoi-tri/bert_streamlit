@@ -20,7 +20,7 @@ if not ES_URL and "ELASTICSEARCH" in st.secrets:
     ES_KEY = st.secrets["ELASTICSEARCH"].get("ES_KEY")
 
 # 인덱스 물리 별칭(Alias) 정의
-ES_INDEX_NAME = "rcm_hf_prd_meta_vec"
+ES_INDEX_NAME = st.secrets["ELASTICSEARCH"].get("ES_IDX")
 
 
 # 2. Elasticsearch 연결 싱글톤 캐시 구현
