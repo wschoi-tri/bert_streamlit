@@ -303,7 +303,7 @@ css_style = (
 "</style>"
 )
 st.markdown(css_style, unsafe_allow_html=True)
-
+ 
 
 # --- 2. 메인 화면 헤더 및 타이틀 ---
 st.markdown("<h2 style='color: #2c3e50; font-weight: 700; margin-top: 5px; margin-bottom: 25px;'>유사상품 추천 ES (LF사입상품)</h2>", unsafe_allow_html=True)
