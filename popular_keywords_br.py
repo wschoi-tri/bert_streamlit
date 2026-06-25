@@ -189,7 +189,7 @@ if data:
         
         col_title, col_link = st.columns([5, 1])
         with col_title:
-            st.markdown(f'<div class="keyword-title">🛍️ **{selected_kw}** 인기 상품</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="keyword-title">"{selected_kw}" 키워드 검색</div>', unsafe_allow_html=True)
         with col_link:
             st.link_button(f"🔗 보리 검색", f"https://m.boribori.co.kr/search/{selected_kw}", use_container_width=True)
             
