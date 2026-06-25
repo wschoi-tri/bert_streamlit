@@ -158,7 +158,7 @@ if data:
             st.session_state.selected_keyword = kw
             st.session_state.cleared_state = True
 
-        st.subheader("📊 실시간 인기 검색어 순위 (Top 10)")
+        # st.subheader("📊 실시간 인기 검색어 순위 (Top 10)")
         
         # 10열 그리드로 인기 검색어 버튼을 최상단에 1줄로 배치
         cols_btn = st.columns(10)
