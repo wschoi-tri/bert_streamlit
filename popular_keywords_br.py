@@ -4,7 +4,8 @@ import concurrent.futures
 
 # 페이지 설정
 st.set_page_config(
-    page_title="보리 인기 키워드",
+    page_title="인기키워드",
+    page_icon="🔥",
     layout="wide"
 )
 
@@ -197,14 +198,20 @@ if data:
             st.session_state.selected_keyword = kw
             st.session_state.cleared_state = True  # 화면 클리어 상태 활성화
 
-        # 상단 타이틀 및 현황을 한 줄로 모아 공간 절약
-        col_head1, col_head2, col_head3 = st.columns([4, 4, 2])
-        with col_head1:
-            st.markdown(f'<div class="keyword-title" style="margin-top: 6px;">📊 인기 검색어 결과 (Top 10)</div>', unsafe_allow_html=True)
-        with col_head2:
-            st.markdown(f'<div class="keyword-title" style="margin-top: 6px; text-align: center;">🛍️ "{selected_kw}" 검색 결과</div>', unsafe_allow_html=True)
-        with col_head3:
-            st.link_button(f"🔗 보리 검색 이동", f"https://m.boribori.co.kr/search/{selected_kw}", use_container_width=True)
+        # 상단 타이틀은 좌측 정렬, 키워드 표시 및 검색 이동 버튼은 우측 정렬로 수평 배치
+        col_head_left, col_head_right = st.columns([1, 1])
+        with col_head_left:
+            st.markdown(f'<div class="keyword-title" style="margin-top: 6px; text-align: left;">📊 인기 검색어 결과 (Top 10)</div>', unsafe_allow_html=True)
+        with col_head_right:
+            # flex 컨테이너를 사용하여 우측 정렬 및 링크 버튼 수평 배치
+            right_html = (
+                f'<div style="display: flex; justify-content: flex-end; align-items: center; gap: 15px; margin-top: 6px;">'
+                f'<div class="keyword-title" style="margin: 0;">🛍️ "{selected_kw}" 검색 결과</div>'
+                f'<a href="https://m.boribori.co.kr/search/{selected_kw}" target="_blank" class="rel-keyword-badge" '
+                f'style="margin: 0; padding: 4px 10px; background-color: #ff4b4b; color: white; border: none; font-size: 0.8em; border-radius: 6px;">🔗 보리 검색</a>'
+                f'</div>'
+            )
+            st.markdown(right_html, unsafe_allow_html=True)
 
         # 10열 그리드로 인기 검색어 버튼을 상단에 1줄로 배치
         cols_btn = st.columns(10)
