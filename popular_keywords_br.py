@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+import concurrent.futures
 
 # 페이지 설정
 st.set_page_config(
@@ -108,7 +109,8 @@ def fetch_popular_keywords():
 def fetch_all_products_data(keywords_list):
     all_data = {}
     search_api_url = "https://apix.boribori.co.kr/searches/prdList/"
-    for kw in keywords_list:
+    
+    def fetch_single_keyword(kw):
         params = {
             "keyword": kw,
             "limit": "0,40",
@@ -117,25 +119,32 @@ def fetch_all_products_data(keywords_list):
             "device": "mc",
         }
         try:
-            resp = requests.get(search_api_url, params=params, timeout=15)
+            resp = requests.get(search_api_url, params=params, timeout=10)
             resp.raise_for_status()
             search_data = resp.json()
             hits = search_data.get("data", {}).get("result", {}).get("hits", {}).get("hits", [])
             rel_keywords = search_data.get("data", {}).get("rel_keywords", [])
-            all_data[kw] = {
+            return kw, {
                 "hits": hits,
                 "rel_keywords": rel_keywords,
                 "url": resp.url,
                 "raw_data": search_data
             }
         except Exception as e:
-            all_data[kw] = {
+            return kw, {
                 "hits": [],
                 "rel_keywords": [],
                 "url": "",
                 "raw_data": {},
                 "error": str(e)
             }
+
+    # 최대 10개의 스레드를 사용하여 병렬 처리 (순차 호출 대비 약 5~10배 빠름)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        results = executor.map(fetch_single_keyword, keywords_list)
+        for kw, result_dict in results:
+            all_data[kw] = result_dict
+            
     return all_data
 
 if "popular_keywords_data" not in st.session_state:
@@ -186,6 +195,7 @@ if data:
         # 버튼 클릭 시 즉시 탭 상태 업데이트 콜백
         def select_keyword_callback(kw):
             st.session_state.selected_keyword = kw
+            st.session_state.cleared_state = True  # 화면 클리어 상태 활성화
 
         # 상단 타이틀 및 현황을 한 줄로 모아 공간 절약
         col_head1, col_head2, col_head3 = st.columns([4, 4, 2])
@@ -213,6 +223,12 @@ if data:
             )
 
         st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+
+        # 탭 전환 시 화면 지우기 구현: cleared_state가 True이면 지워진 상태로 즉시 한 번 렌더링하고 다시 Rerun
+        if st.session_state.get("cleared_state", False):
+            st.session_state.cleared_state = False
+            st.info("🔄 새로운 상품 목록을 불러오는 중...")
+            st.rerun()
             
         # 사전 로드된 상품 정보 가져오기 (딜레이 없음)
         kw_data = products_cache.get(selected_kw, {"hits": [], "rel_keywords": [], "url": "", "raw_data": {}})
