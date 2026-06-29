@@ -181,13 +181,22 @@ if data:
         if "selected_keyword" not in st.session_state or st.session_state.selected_keyword not in top_keywords:
             st.session_state.selected_keyword = top_keywords[0]
 
+        selected_kw = st.session_state.selected_keyword
+
         # 버튼 클릭 시 즉시 탭 상태 업데이트 콜백
         def select_keyword_callback(kw):
             st.session_state.selected_keyword = kw
 
-        st.subheader("📊 실시간 인기 검색어 순위 (Top 10)")
-        
-        # 10열 그리드로 인기 검색어 버튼을 최상단에 1줄로 배치
+        # 상단 타이틀 및 현황을 한 줄로 모아 공간 절약
+        col_head1, col_head2, col_head3 = st.columns([4, 4, 2])
+        with col_head1:
+            st.markdown(f'<div class="keyword-title" style="margin-top: 6px;">📊 인기 검색어 결과 (Top 10)</div>', unsafe_allow_html=True)
+        with col_head2:
+            st.markdown(f'<div class="keyword-title" style="margin-top: 6px; text-align: center;">🛍️ "{selected_kw}" 검색 결과</div>', unsafe_allow_html=True)
+        with col_head3:
+            st.link_button(f"🔗 보리 검색 이동", f"https://m.boribori.co.kr/search/{selected_kw}", use_container_width=True)
+
+        # 10열 그리드로 인기 검색어 버튼을 상단에 1줄로 배치
         cols_btn = st.columns(10)
         for idx, kw in enumerate(top_keywords):
             btn_label = f"{idx+1}. {kw}"
@@ -204,15 +213,6 @@ if data:
             )
 
         st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
-
-        # 선택된 키워드 및 해당 상품 영역
-        selected_kw = st.session_state.selected_keyword
-        
-        col_title, col_link = st.columns([5, 1])
-        with col_title:
-            st.markdown(f'<div class="keyword-title">🛍️ **{selected_kw}** 인기 상품</div>', unsafe_allow_html=True)
-        with col_link:
-            st.link_button(f"🔗 보리 검색", f"https://m.boribori.co.kr/search/{selected_kw}", use_container_width=True)
             
         # 사전 로드된 상품 정보 가져오기 (딜레이 없음)
         kw_data = products_cache.get(selected_kw, {"hits": [], "rel_keywords": [], "url": "", "raw_data": {}})
