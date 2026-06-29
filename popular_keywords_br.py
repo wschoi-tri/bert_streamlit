@@ -232,23 +232,20 @@ if data:
                     except (ValueError, TypeError):
                         price_str = f"{price}원"
                         
-                    grid_items_html.append(f"""
-                        <a href="https://m.boribori.co.kr/product/{prd_no}" target="_blank" style="text-decoration: none; color: inherit;">
-                            <div class="product-card">
-                                <img src="{img_url}" style="width:100%; height:95px; border-radius:6px; margin-bottom:4px; object-fit: cover;">
-                                <div class="brand-text">{brand_nm}</div>
-                                <div class="title-text">{prd_nm}</div>
-                                <div class="price-text">{price_str}</div>
-                            </div>
-                        </a>
-                    """)
+                    card_html = (
+                        f'<a href="https://m.boribori.co.kr/product/{prd_no}" target="_blank" style="text-decoration: none; color: inherit;">'
+                        f'<div class="product-card">'
+                        f'<img src="{img_url}" style="width:100%; height:95px; border-radius:6px; margin-bottom:4px; object-fit: cover;">'
+                        f'<div class="brand-text">{brand_nm}</div>'
+                        f'<div class="title-text">{prd_nm}</div>'
+                        f'<div class="price-text">{price_str}</div>'
+                        f'</div>'
+                        f'</a>'
+                    )
+                    grid_items_html.append(card_html)
                 
-                # HTML Grid 구조 생성 및 일괄 렌더링
-                grid_html = f"""
-                <div style="display: grid; grid-template-columns: repeat(10, 1fr); gap: 8px;">
-                    {"".join(grid_items_html)}
-                </div>
-                """
+                # HTML Grid 구조 생성 및 일괄 렌더링 (들여쓰기가 없는 단일 텍스트 구조로 생성하여 마크다운 코드블록 처리 회피)
+                grid_html = f'<div style="display: grid; grid-template-columns: repeat(10, 1fr); gap: 8px;">{"".join(grid_items_html)}</div>'
                 st.markdown(grid_html, unsafe_allow_html=True)
                         
             else:
