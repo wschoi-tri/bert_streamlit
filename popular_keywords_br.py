@@ -14,36 +14,38 @@ st.markdown("""
     <style>
     /* 여백 최소화 */
     .block-container {
-        padding-top: 3.5rem !important;
-        padding-bottom: 1rem !important;
+        padding-top: 2.2rem !important;
+        padding-bottom: 0.5rem !important;
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
     }
     /* 버튼 컴팩트화 */
     div.stButton > button {
-        padding: 4px 6px !important;
-        font-size: 0.75rem !important;
+        padding: 2px 4px !important;
+        font-size: 0.72rem !important;
         height: auto !important;
     }
     .keyword-title {
-        font-size: 1.0rem;
+        font-size: 0.95rem;
         font-weight: 700;
         color: #1e293b;
     }
     .product-card {
         background-color: white;
-        padding: 5px;
+        padding: 4px;
         border-radius: 6px;
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
-        margin-bottom: 5px;
-        transition: transform 0.2s;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        margin-bottom: 4px;
+        transition: transform 0.15s;
         border: 1px solid #f1f5f9;
         text-align: left;
     }
     .product-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.04);
     }
     .brand-text {
-        font-size: 0.6em;
+        font-size: 0.58em;
         font-weight: 600;
         color: #888888;
         margin-bottom: 1px;
@@ -52,13 +54,13 @@ st.markdown("""
         text-overflow: ellipsis;
     }
     .price-text {
-        font-size: 0.8em;
+        font-size: 0.78em;
         font-weight: 800;
         color: #ff4b4b;
         margin: 1px 0;
     }
     .title-text {
-        font-size: 0.65em;
+        font-size: 0.62em;
         color: #333333;
         font-weight: 500;
         overflow: hidden;
@@ -70,7 +72,7 @@ st.markdown("""
         line-height: 1.3;
     }
     .divider {
-        margin: 8px 0;
+        margin: 4px 0;
         border-bottom: 1px solid #e2e8f0;
     }
     /* 연관 키워드 배지 */
@@ -78,11 +80,11 @@ st.markdown("""
         display: inline-block;
         background-color: #f1f5f9;
         color: #475569;
-        padding: 2px 6px;
+        padding: 2px 5px;
         border-radius: 4px;
-        margin-right: 5px;
-        margin-bottom: 5px;
-        font-size: 0.75em;
+        margin-right: 4px;
+        margin-bottom: 4px;
+        font-size: 0.72em;
         text-decoration: none;
         font-weight: 500;
         border: 1px solid #e2e8f0;
@@ -106,86 +108,37 @@ def fetch_popular_keywords():
         st.error(f"인기 검색어 API 호출 중 오류가 발생했습니다: {e}")
         return None
 
+# 단일 키워드의 상품 정보와 연관 키워드를 가져와 캐싱하는 함수 (온디맨드 호출)
 @st.cache_data(ttl=300)
-def fetch_all_products_data(keywords_list):
-    all_data = {}
+def fetch_product_data_for_keyword(kw):
     search_api_url = "https://apix.boribori.co.kr/searches/prdList/"
-    
-    def fetch_single_keyword(kw):
-        params = {
-            "keyword": kw,
-            "limit": "0,40",
-            "sortSeq": "12",
-            "siteCd": "2",
-            "device": "mc",
+    params = {
+        "keyword": kw,
+        "limit": "0,40",
+        "sortSeq": "12",
+        "siteCd": "2",
+        "device": "mc",
+    }
+    try:
+        resp = requests.get(search_api_url, params=params, timeout=10)
+        resp.raise_for_status()
+        search_data = resp.json()
+        hits = search_data.get("data", {}).get("result", {}).get("hits", {}).get("hits", [])
+        rel_keywords = search_data.get("data", {}).get("rel_keywords", [])
+        return {
+            "hits": hits,
+            "rel_keywords": rel_keywords,
+            "url": resp.url,
+            "raw_data": search_data
         }
-        try:
-            resp = requests.get(search_api_url, params=params, timeout=10)
-            resp.raise_for_status()
-            search_data = resp.json()
-            hits = search_data.get("data", {}).get("result", {}).get("hits", {}).get("hits", [])
-            rel_keywords = search_data.get("data", {}).get("rel_keywords", [])
-            return kw, {
-                "hits": hits,
-                "rel_keywords": rel_keywords,
-                "url": resp.url,
-                "raw_data": search_data
-            }
-        except Exception as e:
-            return kw, {
-                "hits": [],
-                "rel_keywords": [],
-                "url": "",
-                "raw_data": {},
-                "error": str(e)
-            }
-
-    # 최대 10개의 스레드를 사용하여 병렬 처리 (순차 호출 대비 약 5~10배 빠름)
-    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-        results = executor.map(fetch_single_keyword, keywords_list)
-        for kw, result_dict in results:
-            all_data[kw] = result_dict
-            
-    return all_data
-
-if "popular_keywords_data" not in st.session_state:
-    with st.spinner("실시간 인기 검색어를 불러오는 중..."):
-        st.session_state.popular_keywords_data = fetch_popular_keywords()
-
-data = st.session_state.popular_keywords_data
-
-if data:
-    keywords = []
-    
-    def extract_keywords_from_list(items):
-        return [item.get("keyword") for item in items if isinstance(item, dict) and item.get("keyword")]
-
-    if isinstance(data, list):
-        keywords = extract_keywords_from_list(data)
-    elif isinstance(data, dict):
-        target_data = data.get("data")
-        if isinstance(target_data, list):
-            keywords = extract_keywords_from_list(target_data)
-        elif isinstance(target_data, dict):
-            for key in ("result", "list", "items"):
-                if isinstance(target_data.get(key), list):
-                    keywords = extract_keywords_from_list(target_data[key])
-                    break
-
-    if keywords:
-        top_keywords = keywords[:10]
-        
-        # 구버전 캐시 데이터 자동 갱신 (마이그레이션 방지)
-        if "products_cache" in st.session_state and st.session_state.products_cache:
-            first_val = list(st.session_state.products_cache.values())[0]
-            if "rel_keywords" not in first_val:
-                del st.session_state.products_cache
-
-        if "products_cache" not in st.session_state:
-            with st.spinner("전체 인기 키워드의 상품 정보를 일괄 사전 로드 중입니다..."):
-                st.session_state.products_cache = fetch_all_products_data(top_keywords)
-        
-        products_cache = st.session_state.products_cache
+    except Exception as e:
+        return {
+            "hits": [],
+            "rel_keywords": [],
+            "url": "",
+            "raw_data": {},
+            "error": str(e)
+        }
         
         # 세션 상태 초기화
         if "selected_keyword" not in st.session_state or st.session_state.selected_keyword not in top_keywords:
@@ -237,8 +190,8 @@ if data:
             st.info("🔄 새로운 상품 목록을 불러오는 중...")
             st.rerun()
             
-        # 사전 로드된 상품 정보 가져오기 (딜레이 없음)
-        kw_data = products_cache.get(selected_kw, {"hits": [], "rel_keywords": [], "url": "", "raw_data": {}})
+        # 온디맨드 방식으로 현재 선택된 키워드의 데이터만 가져옴 (첫 로딩 속도 10배 이상 향상 및 멀티스레드 차단 방지)
+        kw_data = fetch_product_data_for_keyword(selected_kw)
         hits = kw_data.get("hits", [])
         rel_kws = kw_data.get("rel_keywords", [])
         
@@ -264,7 +217,7 @@ if data:
                     card_html = (
                         f'<a href="https://m.boribori.co.kr/product/{prd_no}" target="_blank" style="text-decoration: none; color: inherit;">'
                         f'<div class="product-card">'
-                        f'<img src="{img_url}" style="width:100%; height:95px; border-radius:6px; margin-bottom:4px; object-fit: cover;">'
+                        f'<img src="{img_url}" style="width:100%; aspect-ratio: 1/1; border-radius:6px; margin-bottom:4px; object-fit: cover;">'
                         f'<div class="brand-text">{brand_nm}</div>'
                         f'<div class="title-text">{prd_nm}</div>'
                         f'<div class="price-text">{price_str}</div>'
@@ -280,18 +233,24 @@ if data:
             else:
                 st.info("검색 결과가 없습니다.")
 
-            # 연관 키워드 영역
+            # 연관 키워드 영역 (한 줄로 배치하여 공간 절약)
             if rel_kws:
                 st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
-                st.markdown("<span style='font-size:0.85rem; font-weight:bold; color:#475569;'>🔗 연관 검색어:</span>", unsafe_allow_html=True)
                 badge_htmls = []
                 for item in rel_kws:
                     rel_kw = item.get("keyword")
                     if rel_kw:
                         badge_htmls.append(
-                            f'<a class="rel-keyword-badge" href="https://m.boribori.co.kr/search/{rel_kw}" target="_blank">{rel_kw}</a>'
+                            f'<a class="rel-keyword-badge" style="margin: 0 4px 0 0;" href="https://m.boribori.co.kr/search/{rel_kw}" target="_blank">{rel_kw}</a>'
                         )
-                st.markdown("".join(badge_htmls), unsafe_allow_html=True)
+                
+                rel_html = (
+                    f'<div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">'
+                    f'<span style="font-size: 0.8rem; font-weight: bold; color: #475569; white-space: nowrap;">🔗 연관 검색어:</span>'
+                    f'{"".join(badge_htmls)}'
+                    f'</div>'
+                )
+                st.markdown(rel_html, unsafe_allow_html=True)
                 
             with st.expander("🛠️ 개발자용 API 정보 확인"):
                 st.caption(f"검색 API URL: [이동]({kw_data.get('url')})")
