@@ -165,6 +165,12 @@ if data:
     if keywords:
         top_keywords = keywords[:10]
         
+        # 구버전 캐시 데이터 자동 갱신 (마이그레이션 방지)
+        if "products_cache" in st.session_state and st.session_state.products_cache:
+            first_val = list(st.session_state.products_cache.values())[0]
+            if "rel_keywords" not in first_val:
+                del st.session_state.products_cache
+
         if "products_cache" not in st.session_state:
             with st.spinner("전체 인기 키워드의 상품 정보를 일괄 사전 로드 중입니다..."):
                 st.session_state.products_cache = fetch_all_products_data(top_keywords)
