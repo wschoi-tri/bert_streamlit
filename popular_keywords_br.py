@@ -171,18 +171,21 @@ if data:
         
         products_cache = st.session_state.products_cache
         
+        # 세션 상태 초기화
         if "selected_keyword" not in st.session_state or st.session_state.selected_keyword not in top_keywords:
             st.session_state.selected_keyword = top_keywords[0]
 
+        # 버튼 클릭 시 즉시 탭 상태 업데이트 콜백
         def select_keyword_callback(kw):
             st.session_state.selected_keyword = kw
-            st.session_state.cleared_state = True
 
         st.subheader("📊 실시간 인기 검색어 순위 (Top 10)")
         
+        # 10열 그리드로 인기 검색어 버튼을 최상단에 1줄로 배치
         cols_btn = st.columns(10)
         for idx, kw in enumerate(top_keywords):
             btn_label = f"{idx+1}. {kw}"
+            # 현재 선택된 키워드 강조 표시
             if kw == st.session_state.selected_keyword:
                 btn_label = f"✨{idx+1}.{kw}"
                 
@@ -195,11 +198,8 @@ if data:
             )
 
         st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
-        
-        if st.session_state.get("cleared_state", False):
-            st.session_state.cleared_state = False
-            st.rerun()
 
+        # 선택된 키워드 및 해당 상품 영역
         selected_kw = st.session_state.selected_keyword
         
         col_title, col_link = st.columns([5, 1])
@@ -208,6 +208,7 @@ if data:
         with col_link:
             st.link_button(f"🔗 보리 검색", f"https://m.boribori.co.kr/search/{selected_kw}", use_container_width=True)
             
+        # 사전 로드된 상품 정보 가져오기 (딜레이 없음)
         kw_data = products_cache.get(selected_kw, {"hits": [], "rel_keywords": [], "url": "", "raw_data": {}})
         hits = kw_data.get("hits", [])
         rel_kws = kw_data.get("rel_keywords", [])
@@ -216,8 +217,9 @@ if data:
             st.error(f"상품 정보를 불러오는 중 오류가 발생했습니다: {kw_data['error']}")
         else:
             if hits:
-                cols = st.columns(10)
-                for idx, hit in enumerate(hits):
+                # 40개 상품 카드를 단 하나의 HTML 그리드로 묶어서 렌더링 (Streamlit WebSocket 컴포넌트 렌더링 병목 해결)
+                grid_items_html = []
+                for hit in hits:
                     source = hit.get("_source", {})
                     prd_nm = source.get("prdNm", "")
                     prd_no = source.get("prdNo", "")
@@ -230,22 +232,29 @@ if data:
                     except (ValueError, TypeError):
                         price_str = f"{price}원"
                         
-                    with cols[idx % 10]:
-                        st.markdown(f"""
-                            <a href="https://m.boribori.co.kr/product/{prd_no}" target="_blank" style="text-decoration: none; color: inherit;">
-                                <div class="product-card">
-                                    <img src="{img_url}" style="width:100%; height:95px; border-radius:6px; margin-bottom:4px; object-fit: cover;">
-                                    <div class="brand-text">{brand_nm}</div>
-                                    <div class="title-text">{prd_nm}</div>
-                                    <div class="price-text">{price_str}</div>
-                                </div>
-                            </a>
-                        """, unsafe_allow_html=True)
+                    grid_items_html.append(f"""
+                        <a href="https://m.boribori.co.kr/product/{prd_no}" target="_blank" style="text-decoration: none; color: inherit;">
+                            <div class="product-card">
+                                <img src="{img_url}" style="width:100%; height:95px; border-radius:6px; margin-bottom:4px; object-fit: cover;">
+                                <div class="brand-text">{brand_nm}</div>
+                                <div class="title-text">{prd_nm}</div>
+                                <div class="price-text">{price_str}</div>
+                            </div>
+                        </a>
+                    """)
+                
+                # HTML Grid 구조 생성 및 일괄 렌더링
+                grid_html = f"""
+                <div style="display: grid; grid-template-columns: repeat(10, 1fr); gap: 8px;">
+                    {"".join(grid_items_html)}
+                </div>
+                """
+                st.markdown(grid_html, unsafe_allow_html=True)
                         
             else:
                 st.info("검색 결과가 없습니다.")
 
-            # 연관 키워드 영역 추가
+            # 연관 키워드 영역
             if rel_kws:
                 st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
                 st.markdown("<span style='font-size:0.85rem; font-weight:bold; color:#475569;'>🔗 연관 검색어:</span>", unsafe_allow_html=True)
