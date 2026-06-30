@@ -190,7 +190,7 @@ if data:
         # 상단 타이틀은 좌측 정렬, 키워드 표시 및 검색 이동 버튼은 우측 정렬로 수평 배치
         col_head_left, col_head_right = st.columns([1, 1])
         with col_head_left:
-            st.markdown(f'<div class="keyword-title" style="margin-top: 6px; text-align: left;">📊 인기 검색어 결과 (Top 10)</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="keyword-title" style="margin-top: 6px; text-align: left; font-size: 1.15rem; font-weight: 800; color: #ff4b4b;">🔥 보리 실시간 인기 키워드 (Top 10)</div>', unsafe_allow_html=True)
         with col_head_right:
             # flex 컨테이너를 사용하여 우측 정렬 및 링크 버튼 수평 배치
             right_html = (
