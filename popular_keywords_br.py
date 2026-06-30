@@ -14,9 +14,17 @@ st.markdown("""
     /* 여백 최소화 */
     .block-container {
         padding-top: 2.2rem !important;
-        padding-bottom: 0.5rem !important;
-        padding-left: 1.5rem !important;
-        padding-right: 1.5rem !important;
+        padding-bottom: 0.2rem !important;
+        padding-left: 1.0rem !important;
+        padding-right: 1.0rem !important;
+    }
+    /* Streamlit 기본 위젯간 세로 마진 제거 */
+    div[data-testid="stVerticalBlock"] {
+        gap: 0rem !important;
+    }
+    div[data-testid="stVerticalBlock"] > div {
+        padding-top: 0rem !important;
+        padding-bottom: 0rem !important;
     }
     /* 버튼 컴팩트화 */
     div.stButton > button {
@@ -28,13 +36,15 @@ st.markdown("""
         font-size: 0.95rem;
         font-weight: 700;
         color: #1e293b;
+        margin-top: 2px !important;
+        margin-bottom: 2px !important;
     }
     .product-card {
         background-color: white;
-        padding: 4px;
+        padding: 3px !important;
         border-radius: 6px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-        margin-bottom: 4px;
+        margin-bottom: 2px !important;
         transition: transform 0.15s;
         border: 1px solid #f1f5f9;
         text-align: left;
@@ -71,7 +81,7 @@ st.markdown("""
         line-height: 1.3;
     }
     .divider {
-        margin: 4px 0;
+        margin: 4px 0 !important;
         border-bottom: 1px solid #e2e8f0;
     }
     /* 연관 키워드 배지 */
@@ -243,7 +253,7 @@ if data:
                     card_html = (
                         f'<a href="https://m.boribori.co.kr/product/{prd_no}" target="_blank" style="text-decoration: none; color: inherit;">'
                         f'<div class="product-card">'
-                        f'<img src="{img_url}" style="width:100%; aspect-ratio: 1/1; border-radius:6px; margin-bottom:4px; object-fit: cover;">'
+                        f'<img src="{img_url}" style="width:100%; aspect-ratio: 1/1; border-radius:6px; margin-bottom:2px; object-fit: cover;">'
                         f'<div class="brand-text">{brand_nm}</div>'
                         f'<div class="title-text">{prd_nm}</div>'
                         f'<div class="price-text">{price_str}</div>'
@@ -252,8 +262,8 @@ if data:
                     )
                     grid_items_html.append(card_html)
                 
-                # HTML Grid 구조 생성 및 일괄 렌더링 (들여쓰기가 없는 단일 텍스트 구조로 생성하여 마크다운 코드블록 처리 회피)
-                grid_html = f'<div style="display: grid; grid-template-columns: repeat(10, 1fr); gap: 8px;">{"".join(grid_items_html)}</div>'
+                # HTML Grid 구조 생성 및 일괄 렌더링 (들여쓰기가 없는 단일 텍스트 구조로 생성하여 마크다운 코드블록 처리 회피, gap 5px로 축소)
+                grid_html = f'<div style="display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px;">{"".join(grid_items_html)}</div>'
                 st.markdown(grid_html, unsafe_allow_html=True)
                         
             else:
