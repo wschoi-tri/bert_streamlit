@@ -45,7 +45,7 @@ st.markdown("""
     }
     .product-grid {
         display: grid;
-        grid-template-columns: repeat(10, 132px);
+        grid-template-columns: repeat(12, 132px);
         justify-content: center;
         gap: 7px;
         width: 100%;
@@ -234,7 +234,7 @@ if data:
             st.markdown(right_html, unsafe_allow_html=True)
 
         # 10열 그리드로 인기 검색어 버튼을 상단에 1줄로 배치
-        cols_btn = st.columns(12)
+        cols_btn = st.columns(10)
         for idx, kw in enumerate(top_keywords):
             btn_label = f"{idx+1}. {kw}"
             # 현재 선택된 키워드 강조 표시
