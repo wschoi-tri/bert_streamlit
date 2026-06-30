@@ -154,7 +154,7 @@ def fetch_product_data_for_keyword(kw):
     search_api_url = "https://apix.boribori.co.kr/searches/prdList/"
     params = {
         "keyword": kw,
-        "limit": "0,40",
+        "limit": "0,48",
         "sortSeq": "12",
         "siteCd": "2",
         "device": "mc",
