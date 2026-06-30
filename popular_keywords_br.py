@@ -18,10 +18,7 @@ st.markdown("""
         padding-left: 1.0rem !important;
         padding-right: 1.0rem !important;
     }
-    /* Streamlit 기본 위젯간 세로 마진을 안전한 최소값으로 조절 (겹침 방지) */
-    div[data-testid="stVerticalBlock"] {
-        gap: 0.5rem !important;
-    }
+
     /* 버튼 컴팩트화 */
     div.stButton > button {
         padding: 2px 4px !important;
