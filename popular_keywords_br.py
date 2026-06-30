@@ -45,7 +45,7 @@ st.markdown("""
     }
     .product-grid {
         display: grid;
-        grid-template-columns: repeat(12, 142px);
+        grid-template-columns: repeat(12, 155px);
         justify-content: center;
         gap: 7px;
         width: 100%;
