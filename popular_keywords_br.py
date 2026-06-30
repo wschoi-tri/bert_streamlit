@@ -45,8 +45,9 @@ st.markdown("""
     }
     .product-grid {
         display: grid;
-        grid-template-columns: repeat(10, 1fr);
-        gap: 4px;
+        grid-template-columns: repeat(10, 110px);
+        justify-content: center;
+        gap: 6px;
         width: 100%;
     }
     .product-card {
@@ -62,14 +63,14 @@ st.markdown("""
         flex-direction: column;
         justify-content: flex-start;
         box-sizing: border-box;
-        height: 145px;
-        width: 100%;
+        height: 165px;
+        width: 110px;
         overflow: hidden;
     }
     .product-card img {
-        width: 100%;
-        height: 95px;
-        object-fit: contain;
+        width: 110px;
+        height: 110px;
+        object-fit: cover;
         border-radius: 4px;
         margin-bottom: 2px;
     }
