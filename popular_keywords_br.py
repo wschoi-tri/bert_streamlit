@@ -226,7 +226,7 @@ if data:
             # flex 컨테이너를 사용하여 우측 정렬 및 링크 버튼 수평 배치
             right_html = (
                 f'<div style="display: flex; justify-content: flex-end; align-items: center; gap: 15px; margin-top: 6px;">'
-                f'<div class="keyword-title" style="margin: 0;">🛍️ "{selected_kw}" 검색 결과</div>'
+                f'<div class="keyword-title" style="margin: 0;">"{selected_kw}" 검색 결과</div>'
                 f'<a href="https://m.boribori.co.kr/search/{selected_kw}" target="_blank" class="rel-keyword-badge" '
                 f'style="margin: 0; padding: 4px 10px; background-color: #ff4b4b; color: white; border: none; font-size: 0.8em; border-radius: 6px;">🔗 보리 검색</a>'
                 f'</div>'
@@ -265,6 +265,26 @@ if data:
         if "error" in kw_data:
             st.error(f"상품 정보를 불러오는 중 오류가 발생했습니다: {kw_data['error']}")
         else:
+
+            # 연관 키워드 영역 (한 줄로 배치하여 공간 절약)
+            if rel_kws:
+                st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+                badge_htmls = []
+                for item in rel_kws:
+                    rel_kw = item.get("keyword")
+                    if rel_kw:
+                        badge_htmls.append(
+                            f'<a class="rel-keyword-badge" style="margin: 0 4px 0 0;" href="https://m.boribori.co.kr/search/{rel_kw}" target="_blank">{rel_kw}</a>'
+                        )
+                
+                rel_html = (
+                    f'<div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 6px; margin-bottom: 6px;">'
+                    f'<span style="font-size: 0.8rem; font-weight: bold; color: #475569; white-space: nowrap;">🔗 연관 검색어:</span>'
+                    f'{"".join(badge_htmls)}'
+                    f'</div>'
+                )
+                st.markdown(rel_html, unsafe_allow_html=True)
+                
             if hits:
                 # 40개 상품 카드를 단 하나의 HTML 그리드로 묶어서 렌더링 (Streamlit WebSocket 컴포넌트 렌더링 병목 해결)
                 grid_items_html = []
@@ -302,25 +322,6 @@ if data:
                         
             else:
                 st.info("검색 결과가 없습니다.")
-
-            # 연관 키워드 영역 (한 줄로 배치하여 공간 절약)
-            if rel_kws:
-                st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
-                badge_htmls = []
-                for item in rel_kws:
-                    rel_kw = item.get("keyword")
-                    if rel_kw:
-                        badge_htmls.append(
-                            f'<a class="rel-keyword-badge" style="margin: 0 4px 0 0;" href="https://m.boribori.co.kr/search/{rel_kw}" target="_blank">{rel_kw}</a>'
-                        )
-                
-                rel_html = (
-                    f'<div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 6px; margin-bottom: 6px;">'
-                    f'<span style="font-size: 0.8rem; font-weight: bold; color: #475569; white-space: nowrap;">🔗 연관 검색어:</span>'
-                    f'{"".join(badge_htmls)}'
-                    f'</div>'
-                )
-                st.markdown(rel_html, unsafe_allow_html=True)
                 
             with st.expander("🛠️ 개발자용 API 정보 확인"):
                 st.caption(f"검색 API URL: [이동]({kw_data.get('url')})")
