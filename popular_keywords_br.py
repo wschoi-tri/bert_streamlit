@@ -1,6 +1,5 @@
 import streamlit as st
 import requests
-import concurrent.futures
 
 # 페이지 설정
 st.set_page_config(
@@ -66,7 +65,7 @@ st.markdown("""
         overflow: hidden;
         text-overflow: ellipsis;
         display: -webkit-box;
-        -webkit-line-clamp: 1;
+        -webkit-line-clamp: 1; /* 한 줄로 축소 */
         -webkit-box-orient: vertical;
         height: 1.3em;
         line-height: 1.3;
@@ -139,6 +138,33 @@ def fetch_product_data_for_keyword(kw):
             "raw_data": {},
             "error": str(e)
         }
+
+if "popular_keywords_data" not in st.session_state:
+    with st.spinner("실시간 인기 검색어를 불러오는 중..."):
+        st.session_state.popular_keywords_data = fetch_popular_keywords()
+
+data = st.session_state.popular_keywords_data
+
+if data:
+    keywords = []
+    
+    def extract_keywords_from_list(items):
+        return [item.get("keyword") for item in items if isinstance(item, dict) and item.get("keyword")]
+
+    if isinstance(data, list):
+        keywords = extract_keywords_from_list(data)
+    elif isinstance(data, dict):
+        target_data = data.get("data")
+        if isinstance(target_data, list):
+            keywords = extract_keywords_from_list(target_data)
+        elif isinstance(target_data, dict):
+            for key in ("result", "list", "items"):
+                if isinstance(target_data.get(key), list):
+                    keywords = extract_keywords_from_list(target_data[key])
+                    break
+
+    if keywords:
+        top_keywords = keywords[:10]
         
         # 세션 상태 초기화
         if "selected_keyword" not in st.session_state or st.session_state.selected_keyword not in top_keywords:
