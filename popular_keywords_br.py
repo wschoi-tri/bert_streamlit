@@ -50,31 +50,31 @@ st.markdown("""
     }
     .product-card {
         background-color: white;
-        padding: 3px !important;
+        padding: 4px !important;
         border-radius: 6px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
         margin-bottom: 0px !important;
         transition: transform 0.15s;
         border: 1px solid #f1f5f9;
         text-align: left;
-        height: 135px;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
+        justify-content: flex-start;
         box-sizing: border-box;
     }
     .product-card img {
         width: 100%;
-        height: 90px;
+        aspect-ratio: 1/1;
         border-radius: 4px;
         object-fit: cover;
+        margin-bottom: 4px;
     }
     .product-card:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.04);
     }
     .brand-text {
-        font-size: 8px;
+        font-size: 10px;
         font-weight: 600;
         color: #888888;
         margin-top: 1px;
@@ -85,10 +85,10 @@ st.markdown("""
         line-height: 1.1;
     }
     .price-text {
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 800;
         color: #ff4b4b;
-        margin-top: 1px;
+        margin-top: 2px;
         margin-bottom: 0px;
         white-space: nowrap;
         overflow: hidden;
@@ -96,10 +96,10 @@ st.markdown("""
         line-height: 1.1;
     }
     .title-text {
-        font-size: 9px;
+        font-size: 11px;
         color: #333333;
         font-weight: 500;
-        margin-top: 1px;
+        margin-top: 2px;
         margin-bottom: 0px;
         white-space: nowrap;
         overflow: hidden;
