@@ -268,12 +268,10 @@ if data:
                         price_str = f"{price}원"
                         
                     card_html = (
-                        f'<a href="https://m.boribori.co.kr/product/{prd_no}" target="_blank" style="text-decoration: none; color: inherit;">'
-                        f'<div class="product-card">'
-                        f'<img src="{img_url}" style="width:100%; aspect-ratio: 1/1; border-radius:6px; margin-bottom:2px; object-fit: cover;">'
-                        f'<div class="brand-text">{brand_nm}</div>'
-                        f'<div class="title-text">{prd_nm}</div>'
-                        f'<div class="price-text">{price_str}</div>'
+                        f'<a href="https://m.boribori.co.kr/product/{prd_no}" target="_blank" style="text-decoration: none; color: inherit; position: relative; display: block;">'
+                        f'<div class="product-card" style="position: relative; overflow: hidden; padding: 0 !important; border-radius: 4px; border: 1px solid #f1f5f9; max-width: 115px; margin: 0 auto;">'
+                        f'<img src="{img_url}" style="width:100%; aspect-ratio: 1/1; display: block; object-fit: cover;">'
+                        f'<div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0, 0, 0, 0.6); color: white; font-size: 10px; font-weight: 800; text-align: center; padding: 2px 0; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{price_str}</div>'
                         f'</div>'
                         f'</a>'
                     )
