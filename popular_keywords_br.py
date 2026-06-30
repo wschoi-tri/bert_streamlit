@@ -13,7 +13,7 @@ st.markdown("""
     <style>
     /* 여백 최소화 */
     .block-container {
-        padding-top: 2.3rem !important;
+        padding-top: 2.5rem !important;
         padding-bottom: 0.2rem !important;
         padding-left: 1.0rem !important;
         padding-right: 1.0rem !important;
