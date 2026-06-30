@@ -25,6 +25,10 @@ st.markdown("""
         padding-top: 0px !important;
         padding-bottom: 0px !important;
     }
+    /* 버튼 컬럼(stHorizontalBlock) 하단 마진을 음수로 하여 아래 요소를 강제로 끌어올림 (공백 극소화) */
+    div[data-testid="stHorizontalBlock"] {
+        margin-bottom: -15px !important;
+    }
 
     /* 버튼 컴팩트화 */
     div.stButton > button {
@@ -231,7 +235,7 @@ if data:
                 args=(kw,)
             )
 
-        st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+
 
         # 탭 전환 시 화면 지우기 구현: cleared_state가 True이면 지워진 상태로 즉시 한 번 렌더링하고 다시 Rerun
         if st.session_state.get("cleared_state", False):
@@ -275,8 +279,11 @@ if data:
                     )
                     grid_items_html.append(card_html)
                 
-                # HTML Grid 구조 생성 및 일괄 렌더링 (동적 auto-fill 적용으로 화면 크기에 따라 15~20열 자동 매칭)
-                grid_html = f'<div class="product-grid">{"".join(grid_items_html)}</div>'
+                # HTML Grid 구조 생성 및 일괄 렌더링 (구분선과 리스트를 하나의 HTML 블록으로 합쳐 Streamlit 컴포넌트 간 강제 공백 제거)
+                grid_html = (
+                    f'<div class="divider" style="margin-top: 0px; margin-bottom: 4px;"></div>'
+                    f'<div class="product-grid">{"".join(grid_items_html)}</div>'
+                )
                 st.markdown(grid_html, unsafe_allow_html=True)
                         
             else:
