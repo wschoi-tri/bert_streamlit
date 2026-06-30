@@ -45,57 +45,26 @@ st.markdown("""
     }
     .product-grid {
         display: grid;
-        grid-template-columns: repeat(10, 1fr);
+        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
         gap: 5px;
     }
     .product-card {
         background-color: white;
-        padding: 4px !important;
+        padding: 3px 5px !important;
         border-radius: 6px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
         margin-bottom: 2px !important;
         transition: transform 0.15s;
         border: 1px solid #f1f5f9;
-        text-align: left;
-        max-width: 115px;
-        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        height: 44px;
+        box-sizing: border-box;
     }
     .product-card:hover {
-        transform: translateY(-2px);
+        transform: translateY(-1px);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.04);
-    }
-    .brand-text {
-        font-size: 9px;
-        font-weight: 600;
-        color: #888888;
-        margin-top: 2px;
-        margin-bottom: 0px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        line-height: 1.1;
-    }
-    .price-text {
-        font-size: 11px;
-        font-weight: 800;
-        color: #ff4b4b;
-        margin-top: 1px;
-        margin-bottom: 0px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        line-height: 1.1;
-    }
-    .title-text {
-        font-size: 10px;
-        color: #333333;
-        font-weight: 500;
-        margin-top: 1px;
-        margin-bottom: 0px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        line-height: 1.1;
     }
     .divider {
         margin: 1px 0 !important;
@@ -268,10 +237,16 @@ if data:
                         price_str = f"{price}원"
                         
                     card_html = (
-                        f'<a href="https://m.boribori.co.kr/product/{prd_no}" target="_blank" style="text-decoration: none; color: inherit; position: relative; display: block;">'
-                        f'<div class="product-card" style="position: relative; overflow: hidden; padding: 0 !important; border-radius: 4px; border: 1px solid #f1f5f9; max-width: 115px; margin: 0 auto;">'
-                        f'<img src="{img_url}" style="width:100%; aspect-ratio: 1/1; display: block; object-fit: cover;">'
-                        f'<div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0, 0, 0, 0.6); color: white; font-size: 10px; font-weight: 800; text-align: center; padding: 2px 0; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{price_str}</div>'
+                        f'<a href="https://m.boribori.co.kr/product/{prd_no}" target="_blank" style="text-decoration: none; color: inherit; display: block; width: 100%;">'
+                        f'<div class="product-card">'
+                        f'<img src="{img_url}" style="width: 36px; height: 36px; border-radius: 4px; object-fit: cover; flex-shrink: 0;">'
+                        f'<div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; justify-content: space-between; height: 34px; padding: 1px 0; box-sizing: border-box;">'
+                        f'<div style="display: flex; justify-content: space-between; align-items: center; line-height: 1; margin-bottom: 2px;">'
+                        f'<span style="font-size: 9px; font-weight: 600; color: #888888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px;">{brand_nm}</span>'
+                        f'<span style="font-size: 10px; font-weight: 800; color: #ff4b4b; white-space: nowrap; flex-shrink: 0;">{price_str}</span>'
+                        f'</div>'
+                        f'<div style="font-size: 10px; color: #333333; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1;">{prd_nm}</div>'
+                        f'</div>'
                         f'</div>'
                         f'</a>'
                     )
