@@ -45,7 +45,7 @@ st.markdown("""
     }
     .product-grid {
         display: grid;
-        grid-template-columns: repeat(10, 1fr);
+        grid-template-columns: repeat(8, 1fr);
         gap: 5px;
     }
     .product-card {
@@ -61,6 +61,9 @@ st.markdown("""
         flex-direction: column;
         justify-content: flex-start;
         box-sizing: border-box;
+        height: 180px;
+        max-width: 140px;
+        margin: 0 auto;
     }
     .product-card img {
         width: 100%;
