@@ -18,6 +18,13 @@ st.markdown("""
         padding-left: 1.0rem !important;
         padding-right: 1.0rem !important;
     }
+    /* Streamlit 위젯 요소들 자체의 기본 하단 마진 제거 (버튼-리스트 사이의 빈 여백 완화) */
+    div[data-testid="element-container"] {
+        margin-top: 0px !important;
+        margin-bottom: 2px !important;
+        padding-top: 0px !important;
+        padding-bottom: 0px !important;
+    }
 
     /* 버튼 컴팩트화 */
     div.stButton > button {
