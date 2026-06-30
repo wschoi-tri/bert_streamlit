@@ -18,13 +18,9 @@ st.markdown("""
         padding-left: 1.0rem !important;
         padding-right: 1.0rem !important;
     }
-    /* Streamlit 기본 위젯간 세로 마진 제거 */
+    /* Streamlit 기본 위젯간 세로 마진을 안전한 최소값으로 조절 (겹침 방지) */
     div[data-testid="stVerticalBlock"] {
-        gap: 0rem !important;
-    }
-    div[data-testid="stVerticalBlock"] > div {
-        padding-top: 0rem !important;
-        padding-bottom: 0rem !important;
+        gap: 0.5rem !important;
     }
     /* 버튼 컴팩트화 */
     div.stButton > button {
@@ -94,7 +90,7 @@ st.markdown("""
         line-height: 1.1;
     }
     .divider {
-        margin: 4px 0 !important;
+        margin: 12px 0 6px 0 !important;
         border-bottom: 1px solid #e2e8f0;
     }
     /* 연관 키워드 배지 */
@@ -294,7 +290,7 @@ if data:
                         )
                 
                 rel_html = (
-                    f'<div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">'
+                    f'<div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 6px; margin-bottom: 6px;">'
                     f'<span style="font-size: 0.8rem; font-weight: bold; color: #475569; white-space: nowrap;">🔗 연관 검색어:</span>'
                     f'{"".join(badge_htmls)}'
                     f'</div>'
