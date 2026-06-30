@@ -59,7 +59,7 @@ st.markdown("""
         display: flex;
         align-items: center;
         gap: 8px;
-        height: 44px;
+        height: 50px;
         box-sizing: border-box;
     }
     .product-card:hover {
@@ -239,8 +239,8 @@ if data:
                     card_html = (
                         f'<a href="https://m.boribori.co.kr/product/{prd_no}" target="_blank" style="text-decoration: none; color: inherit; display: block; width: 100%;">'
                         f'<div class="product-card">'
-                        f'<img src="{img_url}" style="width: 36px; height: 36px; border-radius: 4px; object-fit: cover; flex-shrink: 0;">'
-                        f'<div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; justify-content: space-between; height: 34px; padding: 1px 0; box-sizing: border-box;">'
+                        f'<img src="{img_url}" style="width: 44px; height: 44px; border-radius: 4px; object-fit: cover; flex-shrink: 0;">'
+                        f'<div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; justify-content: space-between; height: 42px; padding: 1px 0; box-sizing: border-box;">'
                         f'<div style="display: flex; justify-content: space-between; align-items: center; line-height: 1; margin-bottom: 2px;">'
                         f'<span style="font-size: 9px; font-weight: 600; color: #888888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px;">{brand_nm}</span>'
                         f'<span style="font-size: 10px; font-weight: 800; color: #ff4b4b; white-space: nowrap; flex-shrink: 0;">{price_str}</span>'
