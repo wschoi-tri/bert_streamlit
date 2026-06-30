@@ -251,25 +251,6 @@ if data:
 
 
 
-            # 연관 키워드 영역 (한 줄로 배치하여 공간 절약)
-            if rel_kws:
-                st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
-                badge_htmls = []
-                for item in rel_kws:
-                    rel_kw = item.get("keyword")
-                    if rel_kw:
-                        badge_htmls.append(
-                            f'<a class="rel-keyword-badge" style="margin: 0 4px 0 0;" href="https://m.boribori.co.kr/search/{rel_kw}" target="_blank">{rel_kw}</a>'
-                        )
-                
-                rel_html = (
-                    f'<div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 6px; margin-bottom: 6px;">'
-                    f'<span style="font-size: 0.8rem; font-weight: bold; color: #475569; white-space: nowrap;">🔗 연관 검색어:</span>'
-                    f'{"".join(badge_htmls)}'
-                    f'</div>'
-                )
-                st.markdown(rel_html, unsafe_allow_html=True)
-
         # 탭 전환 시 화면 지우기 구현: cleared_state가 True이면 지워진 상태로 즉시 한 번 렌더링하고 다시 Rerun
         if st.session_state.get("cleared_state", False):
             st.session_state.cleared_state = False
@@ -321,6 +302,25 @@ if data:
                         
             else:
                 st.info("검색 결과가 없습니다.")
+
+            # 연관 키워드 영역 (한 줄로 배치하여 공간 절약)
+            if rel_kws:
+                st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+                badge_htmls = []
+                for item in rel_kws:
+                    rel_kw = item.get("keyword")
+                    if rel_kw:
+                        badge_htmls.append(
+                            f'<a class="rel-keyword-badge" style="margin: 0 4px 0 0;" href="https://m.boribori.co.kr/search/{rel_kw}" target="_blank">{rel_kw}</a>'
+                        )
+                
+                rel_html = (
+                    f'<div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 6px; margin-bottom: 6px;">'
+                    f'<span style="font-size: 0.8rem; font-weight: bold; color: #475569; white-space: nowrap;">🔗 연관 검색어:</span>'
+                    f'{"".join(badge_htmls)}'
+                    f'</div>'
+                )
+                st.markdown(rel_html, unsafe_allow_html=True)
                 
             with st.expander("🛠️ 개발자용 API 정보 확인"):
                 st.caption(f"검색 API URL: [이동]({kw_data.get('url')})")
