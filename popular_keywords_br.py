@@ -87,7 +87,7 @@ st.markdown("""
         line-height: 1.1;
     }
     .divider {
-        margin: 12px 0 6px 0 !important;
+        margin: 1px 0 !important;
         border-bottom: 1px solid #e2e8f0;
     }
     /* 연관 키워드 배지 */
