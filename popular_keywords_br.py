@@ -15,8 +15,8 @@ st.markdown("""
     .block-container {
         padding-top: 2.5rem !important;
         padding-bottom: 0.2rem !important;
-        padding-left: 1.0rem !important;
-        padding-right: 1.0rem !important;
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
     }
     /* Streamlit 위젯 요소들 자체의 기본 하단 마진 제거 (버튼-리스트 사이의 빈 여백 완화) */
     div[data-testid="element-container"] {
@@ -47,6 +47,7 @@ st.markdown("""
         display: grid;
         grid-template-columns: repeat(8, 1fr);
         gap: 5px;
+        width: 100%;
     }
     .product-card {
         background-color: white;
@@ -61,9 +62,8 @@ st.markdown("""
         flex-direction: column;
         justify-content: flex-start;
         box-sizing: border-box;
-        height: 180px;
-        max-width: 140px;
-        margin: 0 auto;
+        height: 100%;
+        width: 100%;
     }
     .product-card img {
         width: 100%;
