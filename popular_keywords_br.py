@@ -3,8 +3,8 @@ import requests
 
 # 페이지 설정
 st.set_page_config(
-    page_title="인기키워드",
-    page_icon="🔥",
+    page_title="검색결과확인 Top10",
+    page_icon="🔎",
     layout="wide"
 )
 
