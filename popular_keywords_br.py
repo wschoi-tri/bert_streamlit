@@ -25,8 +25,8 @@ st.markdown("""
         padding-top: 0px !important;
         padding-bottom: 0px !important;
     }
-    /* 버튼 컬럼(stHorizontalBlock) 하단 마진을 음수로 하여 아래 요소를 강제로 끌어올림 (공백 극소화) */
-    div[data-testid="stHorizontalBlock"] {
+    /* stButton(인기 검색어 10개 버튼)이 포함된 stHorizontalBlock 행만 선택하여 하단 마진을 음수로 적용 (타이틀 행 침범 방지) */
+    div[data-testid="stHorizontalBlock"]:has(div.stButton) {
         margin-bottom: -15px !important;
     }
 
