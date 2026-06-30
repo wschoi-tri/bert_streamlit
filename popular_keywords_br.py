@@ -45,8 +45,8 @@ st.markdown("""
     }
     .product-grid {
         display: grid;
-        grid-template-columns: repeat(8, 1fr);
-        gap: 5px;
+        grid-template-columns: repeat(10, 1fr);
+        gap: 4px;
         width: 100%;
     }
     .product-card {
@@ -62,15 +62,16 @@ st.markdown("""
         flex-direction: column;
         justify-content: flex-start;
         box-sizing: border-box;
-        height: 100%;
+        height: 145px;
         width: 100%;
+        overflow: hidden;
     }
     .product-card img {
         width: 100%;
-        aspect-ratio: 1/1;
+        height: 95px;
+        object-fit: contain;
         border-radius: 4px;
-        object-fit: cover;
-        margin-bottom: 4px;
+        margin-bottom: 2px;
     }
     .product-card:hover {
         transform: translateY(-2px);
