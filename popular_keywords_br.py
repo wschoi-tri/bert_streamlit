@@ -8,38 +8,52 @@ st.set_page_config(
     layout="wide"
 )
 
+# 사이드바에서 카드 크기 비율을 다이나믹하게 조절 가능하도록 함
+card_size = st.sidebar.slider(
+    "상품 크기 조절 (px)", 
+    min_value=50, 
+    max_value=120, 
+    value=70,  # 기본값 70px (기존 80px 대비 약 0.88배 축소)
+    step=5
+)
+
 # 커스텀 CSS 적용으로 프리미엄 스타일 구현
-st.markdown("""
+st.markdown(f"""
     <style>
     /* 여백 최소화 */
-    .block-container {
+    .block-container {{
         padding-top: 2.2rem !important;
         padding-bottom: 0.2rem !important;
         padding-left: 1.0rem !important;
         padding-right: 1.0rem !important;
-    }
+    }}
     /* Streamlit 기본 위젯간 세로 마진 제거 */
-    div[data-testid="stVerticalBlock"] {
+    div[data-testid="stVerticalBlock"] {{
         gap: 0rem !important;
-    }
-    div[data-testid="stVerticalBlock"] > div {
+    }}
+    div[data-testid="stVerticalBlock"] > div {{
         padding-top: 0rem !important;
         padding-bottom: 0rem !important;
-    }
+    }}
     /* 버튼 컴팩트화 */
-    div.stButton > button {
+    div.stButton > button {{
         padding: 2px 4px !important;
         font-size: 0.72rem !important;
         height: auto !important;
-    }
-    .keyword-title {
+    }}
+    .keyword-title {{
         font-size: 0.95rem;
         font-weight: 700;
         color: #1e293b;
         margin-top: 2px !important;
         margin-bottom: 2px !important;
-    }
-    .product-card {
+    }}
+    .product-grid {{
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax({card_size}px, 1fr));
+        gap: 5px;
+    }}
+    .product-card {{
         background-color: white;
         padding: 3px !important;
         border-radius: 6px;
@@ -48,44 +62,52 @@ st.markdown("""
         transition: transform 0.15s;
         border: 1px solid #f1f5f9;
         text-align: left;
-    }
-    .product-card:hover {
+        max-width: {card_size}px;
+        margin: 0 auto;
+    }}
+    .product-card:hover {{
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.04);
-    }
-    .brand-text {
-        font-size: 0.58em;
+    }}
+    .brand-text {{
+        font-size: 9px;
         font-weight: 600;
         color: #888888;
-        margin-bottom: 1px;
+        margin-top: 2px;
+        margin-bottom: 0px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-    }
-    .price-text {
-        font-size: 0.78em;
+        line-height: 1.1;
+    }}
+    .price-text {{
+        font-size: 11px;
         font-weight: 800;
         color: #ff4b4b;
-        margin: 1px 0;
-    }
-    .title-text {
-        font-size: 0.62em;
-        color: #333333;
-        font-weight: 500;
+        margin-top: 1px;
+        margin-bottom: 0px;
+        white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        display: -webkit-box;
-        -webkit-line-clamp: 1; /* 한 줄로 축소 */
-        -webkit-box-orient: vertical;
-        height: 1.3em;
-        line-height: 1.3;
-    }
-    .divider {
+        line-height: 1.1;
+    }}
+    .title-text {{
+        font-size: 10px;
+        color: #333333;
+        font-weight: 500;
+        margin-top: 1px;
+        margin-bottom: 0px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.1;
+    }}
+    .divider {{
         margin: 4px 0 !important;
         border-bottom: 1px solid #e2e8f0;
-    }
+    }}
     /* 연관 키워드 배지 */
-    .rel-keyword-badge {
+    .rel-keyword-badge {{
         display: inline-block;
         background-color: #f1f5f9;
         color: #475569;
@@ -97,11 +119,11 @@ st.markdown("""
         text-decoration: none;
         font-weight: 500;
         border: 1px solid #e2e8f0;
-    }
-    .rel-keyword-badge:hover {
+    }}
+    .rel-keyword-badge:hover {{
         background-color: #e2e8f0;
         color: #1e293b;
-    }
+    }}
     </style>
 """, unsafe_allow_html=True)
 
@@ -262,8 +284,8 @@ if data:
                     )
                     grid_items_html.append(card_html)
                 
-                # HTML Grid 구조 생성 및 일괄 렌더링 (들여쓰기가 없는 단일 텍스트 구조로 생성하여 마크다운 코드블록 처리 회피, gap 5px로 축소)
-                grid_html = f'<div style="display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px;">{"".join(grid_items_html)}</div>'
+                # HTML Grid 구조 생성 및 일괄 렌더링 (동적 auto-fill 적용으로 화면 크기에 따라 15~20열 자동 매칭)
+                grid_html = f'<div class="product-grid">{"".join(grid_items_html)}</div>'
                 st.markdown(grid_html, unsafe_allow_html=True)
                         
             else:
