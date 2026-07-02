@@ -137,7 +137,78 @@ def format_price(value):
     except (TypeError, ValueError):
         return str(value)
 
-from services.coordi_rule import get_coordi_target_categories
+# --- 카테고리 매칭 & 코디 맵핑 규칙 정의 (서버 모듈 의존성 제거를 위해 내장) ---
+GOLF_GROUPS = {"골프", "골프의류"}
+GENERAL_FASHION_GROUPS = {"여성의류", "남성의류", "아동의류"}
+
+TOPS = {"티셔츠", "셔츠/블라우스", "니트/스웨터", "가디건", "베스트", "셔츠", "가디건/베스트", "맨투맨/후드티", "상의"}
+BOTTOMS = {"팬츠", "스커트", "데님팬츠", "하의", "데님"}
+OUTERS = {"자켓", "점퍼", "패딩/다운", "코트", "아우터"}
+DRESSES = {"원피스"}
+SETUPS = {"수트/셋업", "셋업/세트"}
+SPORTS_OUTDOOR = {"아웃도어", "스포츠의류", "스포츠", "골프의류", "트레이닝/트랙수트", "아웃도어의류", "스포츠/레저"}
+
+FORMAL_TOPS = {"기본/솔리드", "정장/테일러드", "기본", "셔츠/블라우스", "셔츠", "울/캐시미어", "트렌치"}
+FORMAL_BOTTOMS = {"슬랙스/정장", "H라인/정장", "슬랙스"}
+
+CASUAL_TOPS = {"라운드넥", "맨투맨/후드", "반팔", "캐주얼", "후드/집업", "맨투맨/후드티", "데님", "점퍼", "민소매", "카라", "브이넥", "터틀넥"}
+CASUAL_BOTTOMS = {"데님팬츠", "반바지", "레깅스", "밴딩", "조거/카고", "와이드", "스트레이트/슬림", "미니/미디", "A라인/플레어", "데님", "배기", "부츠컷", "기모"}
+
+SPORTS_TOPS = {"티셔츠", "셔츠", "상의", "맨투맨", "후드", "폴로셔츠", "니트", "반팔티셔츠", "긴팔티셔츠", "폴로티셔츠", "가디건"}
+SPORTS_BOTTOMS = {"팬츠", "하의", "바지", "레깅스", "트레이닝팬츠", "스커트", "큐롯", "큐롯팬츠", "긴바지", "반바지"}
+SPORTS_OUTERS = {"자켓", "점퍼", "바람막이", "아우터", "패딩", "다운", "베스트", "조끼"}
+
+SPORTS_GOLF_RULES = [
+    (GOLF_GROUPS, SPORTS_OUTDOOR, SPORTS_TOPS | SPORTS_OUTERS, SPORTS_BOTTOMS, "스포츠/아웃도어/골프 매칭", "동일 중분류(성별) 내에서 상/하의 크로싱 적용"),
+    (GOLF_GROUPS, SPORTS_OUTDOOR, SPORTS_BOTTOMS, SPORTS_TOPS | SPORTS_OUTERS, "스포츠/아웃도어/골프 매칭", "동일 중분류(성별) 내에서 상/하의 크로싱 적용"),
+]
+
+STYLE_RULES = [
+    (FORMAL_TOPS, FORMAL_BOTTOMS, BOTTOMS, "소분류 스타일 [포멀(Formal)]", "스타일 속성 매칭 기준 타겟 필터링"),
+    (FORMAL_BOTTOMS, FORMAL_TOPS, TOPS | OUTERS, "소분류 스타일 [포멀(Formal)]", "스타일 속성 매칭 기준 타겟 필터링"),
+    (CASUAL_TOPS, CASUAL_BOTTOMS, BOTTOMS, "소분류 스타일 [캐주얼(Casual)]", "스타일 속성 매칭 기준 타겟 필터링"),
+    (CASUAL_BOTTOMS, CASUAL_TOPS, TOPS | OUTERS, "소분류 스타일 [캐주얼(Casual)]", "스타일 속성 매칭 기준 타겟 필터링"),
+]
+
+CATEGORY_RULES = [
+    (TOPS, BOTTOMS, "중분류 크로스 매칭", "소분류 정보가 없거나 스타일 매핑 외 상품일 경우 적용"),
+    (OUTERS, BOTTOMS, "중분류 크로스 매칭", "소분류 정보가 없거나 스타일 매핑 외 상품일 경우 적용"),
+    (BOTTOMS, TOPS, "중분류 크로스 매칭", "소분류 정보가 없거나 스타일 매핑 외 상품일 경우 적용"),
+    (DRESSES, OUTERS, "중분류 크로스 매칭", "소분류 정보가 없거나 스타일 매핑 외 상품일 경우 적용"),
+    (SETUPS, TOPS | OUTERS, "수트/셋업 매칭", "셋업류 상품과 매치할 상의(이너셔츠) 및 아우터 매칭"),
+]
+
+def get_coordi_target_categories(ctgr1: str, ctgr2: str, ctgr3: str):
+    def clean_targets(t_ctgr2, t_ctgr3, is_sp, is_se, is_go, lbl, dsc):
+        FEMALE_ONLY_CTGR3 = {"레깅스", "미니/미디", "A라인/플레어", "부츠컷", "H라인/정장", "스커트", "큐롯", "큐롯팬츠"}
+        if (ctgr1 == "남성의류" or ctgr2 == "남성의류") and t_ctgr3:
+            t_ctgr3 = [x for x in t_ctgr3 if x not in FEMALE_ONLY_CTGR3]
+        return t_ctgr2, t_ctgr3, is_sp, is_se, is_go, lbl, dsc
+
+    is_sports = ctgr2 in SPORTS_OUTDOOR
+    is_setup = ctgr2 in SETUPS
+    is_golf = ctgr1 in GOLF_GROUPS
+    
+    all_valid_ctgr2 = TOPS | BOTTOMS | OUTERS | DRESSES | SPORTS_OUTDOOR | SETUPS
+    if not is_golf and ctgr2 not in all_valid_ctgr2:
+        return clean_targets([], [], False, False, False, "", "")
+
+    if is_golf or is_sports:
+        for golf_set, sports_set, src_style_set, target_style_set, label, desc in SPORTS_GOLF_RULES:
+            if (ctgr1 in golf_set or ctgr2 in sports_set) and ctgr3 in src_style_set:
+                return clean_targets([], list(target_style_set), is_sports, is_setup, is_golf, f"{label} ({ctgr2})", desc)
+        return clean_targets([], [], is_sports, is_setup, is_golf, f"스포츠/아웃도어/골프 ({ctgr2}) 내 소분류 정보 매칭 불가", "")
+
+    if ctgr3 and ctgr2 not in (DRESSES | SETUPS):
+        for src_set, target_style_set, target_ctgr2_set, label, desc in STYLE_RULES:
+            if ctgr3 in src_set:
+                return clean_targets(list(target_ctgr2_set), list(target_style_set), is_sports, is_setup, is_golf, label, desc)
+
+    for src_set, target_set, label, desc in CATEGORY_RULES:
+        if ctgr2 in src_set:
+            return clean_targets(list(target_set), [], is_sports, is_setup, is_golf, label, desc)
+
+    return clean_targets([], [], is_sports, is_setup, is_golf, "중분류 크로스 매칭", "소분류 정보가 없거나 스타일 매핑 외 상품일 경우 적용")
 
 def get_expected_targets(ctgr1, ctgr2, ctgr3):
     target_ctgr2_list, target_ctgr3_list, is_sports, is_setup, is_golf, label, desc = get_coordi_target_categories(
