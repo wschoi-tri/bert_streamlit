@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script>
+    // Streamlit API helper
+    function sendMessageToStreamlit(type, data) {
+      window.parent.postMessage({
+        isStreamlitMessage: true,
+        type: type,
+        ...data
+      }, "*");
+    }
+
+    // Set component height to 0 so it's completely invisible in the layout
+    sendMessageToStreamlit("streamlit:setFrameHeight", { height: 0 });
+
+    window.addEventListener("message", function(event) {
+      if (event.data.type === "streamlit:render") {
+        const args = event.data.args;
+        const url = args.url;
+        const params = args.params;
+        const method = args.method || "GET";
+        const requestId = args.requestId; // Unique key to trace request responses
+
+        if (!url) return;
+
+        // Construct query string for GET request
+        let fetchUrl = url;
+        if (params && method === "GET") {
+          const queryString = new URLSearchParams();
+          for (const key in params) {
+            if (Array.isArray(params[key])) {
+              params[key].forEach(val => queryString.append(key, val));
+            } else {
+              queryString.append(key, params[key]);
+            }
+          }
+          const connector = fetchUrl.includes("?") ? "&" : "?";
+          fetchUrl += connector + queryString.toString();
+        }
+
+        // Fetch options
+        const options = {
+          method: method,
+          headers: args.headers || {}
+        };
+        if (method !== "GET" && args.body) {
+          options.body = JSON.stringify(args.body);
+          options.headers["Content-Type"] = "application/json";
+        }
+
+        fetch(fetchUrl, options)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error("HTTP error " + response.status);
+            }
+            return response.json();
+          })
+          .then(data => {
+            sendMessageToStreamlit("streamlit:setComponentValue", { 
+              value: { success: true, data: data, requestId: requestId } 
+            });
+          })
+          .catch(error => {
+            sendMessageToStreamlit("streamlit:setComponentValue", { 
+              value: { success: false, error: error.message, requestId: requestId } 
+            });
+          });
+      }
+    });
+
+    // Notify Streamlit that the component is loaded and ready
+    sendMessageToStreamlit("streamlit:componentReady", { apiVersion: 1 });
+  </script>
+</head>
+<body>
+</body>
+</html>
